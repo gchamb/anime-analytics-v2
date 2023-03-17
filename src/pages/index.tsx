@@ -46,7 +46,7 @@ const Home: React.FC<{
 
 							<Link
 								className="flex justify-center items-center gap-x-2 text-sm font-semibold md:justify-end hover:text-aa-4 dark:hover:text-aa-3"
-								href="/discover?type=airing"
+								href="/animes?type=airing"
 							>
 								Show More
 								<ArrowRight className="hidden md:block" />
@@ -55,7 +55,7 @@ const Home: React.FC<{
 					</div>
 					<div className="w-11/12 m-auto flex flex-col gap-y-2 md:w-2/3">
 						<h1 className="font-bold text-2xl text-center md:text-left dark:text-aa-3">Popular Animes</h1>
-						<div className="flex flex-col gap-y-2 bg-aa-1 dark:bg-red-500 p-5 rounded-md dark:bg-aa-dark-1">
+						<div className="flex flex-col gap-y-2 bg-aa-1  p-5 rounded-md dark:bg-aa-dark-1">
 							<div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
 								{popular.map((anime, idx) => {
 									return (
@@ -68,7 +68,7 @@ const Home: React.FC<{
 
 							<Link
 								className="flex justify-center items-center gap-x-2 text-sm font-semibold md:justify-end hover:text-aa-4 dark:hover:text-aa-3"
-								href="/discover?type=popular"
+								href="/animes?type=popular"
 							>
 								Show More
 								<ArrowRight className="hidden md:block" />
@@ -77,7 +77,7 @@ const Home: React.FC<{
 					</div>
 					<div className="w-11/12 m-auto flex flex-col gap-y-2 md:w-2/3">
 						<h1 className="font-bold text-2xl text-center md:text-left dark:text-aa-3">Upcoming Animes</h1>
-						<div className="flex flex-col gap-y-2 bg-aa-1 dark:bg-red-500 p-5 rounded-md dark:bg-aa-dark-1">
+						<div className="flex flex-col gap-y-2 bg-aa-1 p-5 rounded-md dark:bg-aa-dark-1">
 							<div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
 								{upcoming.map((anime, idx) => {
 									return (
@@ -90,7 +90,7 @@ const Home: React.FC<{
 
 							<Link
 								className="flex justify-center items-center gap-x-2 text-sm font-semibold md:justify-end hover:text-aa-4 dark:hover:text-aa-3"
-								href="/discover?type=upcoming"
+								href="/animes?type=upcoming"
 							>
 								Show More
 								<ArrowRight className="hidden md:block" />
