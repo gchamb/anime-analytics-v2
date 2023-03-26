@@ -12,6 +12,8 @@
 	margin: 0;
 }
 
-html body {
+html,
+body, 
+#_next {
 	height: 100vh;
 }
