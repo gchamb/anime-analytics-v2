@@ -1,16 +1,16 @@
 import AnimeResults from "@/components/anime-results";
 import React, { useMemo, useState } from "react";
+import Pagination from "@/components/pagination";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSectionAnimes } from "@/hooks/jikan";
 import { isSection } from "@/lib/types";
-import { getGenres } from "@/lib/utils";
+import { getGenres, pageQuery } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { FullScreen } from "@/components/full-screen";
 
 export default function Animes() {
-	const [page, setPage] = useState(1);
 	const [filters, setFilters] = useState<{
 		genre: string | undefined;
 		episodes: "1-12" | "12-24" | "24+" | undefined;
@@ -22,7 +22,7 @@ export default function Animes() {
 	const router = useRouter();
 	const { loading, data, error } = useSectionAnimes(
 		typeof router.query.type === "string" ? router.query.type : "",
-		page
+		pageQuery()
 	);
 
 	const filteredData = useMemo(() => {
@@ -98,8 +98,19 @@ export default function Animes() {
 		);
 	}
 
+	if (data.data.length === 0) {
+		return (
+			<FullScreen>
+				<div>
+					<h1 className="text-3xl font-bold">No Animes Available.</h1>
+					<p>Try to refresh or new page</p>
+				</div>
+			</FullScreen>
+		);
+	}
+
 	return (
-		<div className="w-11/12 max-w-[1280px] md:w-2/3 m-auto">
+		<div className="grid w-11/12 max-w-[1280px] md:w-2/3 m-auto">
 			<div className="grid grid-cols-3 justify-center gap-x-3 p-5">
 				<Select
 					value={typeof router.query.type === "string" ? router.query.type : ""}
@@ -175,6 +186,27 @@ export default function Animes() {
 			</div>
 
 			<AnimeResults data={filteredData ?? data.data} />
+
+			<Pagination
+				page={pageQuery()}
+				totalPages={data.pagination.last_visible_page}
+				nextPage={() => {
+					router.push(window.location.href, {
+						query: {
+							type: router.query.type,
+							page: pageQuery() + 1,
+						},
+					});
+				}}
+				prevPage={() => {
+					router.push(window.location.href, {
+						query: {
+							type: router.query.type,
+							page: pageQuery() - 1,
+						},
+					});
+				}}
+			/>
 		</div>
 	);
 }

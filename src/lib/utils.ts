@@ -23,3 +23,29 @@ export function getGenres(animes: JikanAnime[] | JikanAnime): string[] {
 
   return Array(...currentGenres);
 }
+
+export function pageQuery(): number {
+  if (typeof window === "undefined") {
+    return 1;
+  }
+
+  const url = new URL(window.location.href);
+
+  const page = url.searchParams.get("page");
+
+  if (page === null) {
+    return 1;
+  }
+
+  const numberPage = Number(page);
+
+  if (isNaN(numberPage)) {
+    return 1;
+  }
+
+  if (numberPage < 1) {
+    return 1;
+  }
+
+  return Number(page);
+}
