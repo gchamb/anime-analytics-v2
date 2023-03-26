@@ -45,7 +45,7 @@ const Home: React.FC<{
               <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
                 {airing.map((anime, idx) => {
                   return (
-                    <Link key={idx} href={`/anime/${anime.mal_id}`}>
+                    <Link key={idx} href={`/animes/${anime.mal_id}`}>
                       <AnimeCover image={anime.image} name={anime.title} />
                     </Link>
                   );
@@ -69,7 +69,7 @@ const Home: React.FC<{
               <div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
                 {popular.map((anime, idx) => {
                   return (
-                    <Link key={idx} href={`/anime/${anime.mal_id}`}>
+                    <Link key={idx} href={`/animes/${anime.mal_id}`}>
                       <AnimeCover image={anime.image} name={anime.title} />
                     </Link>
                   );
@@ -93,7 +93,7 @@ const Home: React.FC<{
               <div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
                 {upcoming.map((anime, idx) => {
                   return (
-                    <Link key={idx} href={`/anime/${anime.mal_id}`}>
+                    <Link key={idx} href={`/animes/${anime.mal_id}`}>
                       <AnimeCover image={anime.image} name={anime.title} />
                     </Link>
                   );
