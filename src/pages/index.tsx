@@ -123,13 +123,6 @@ export const getStaticProps: GetStaticProps = async () => {
 	let popularAnimes: JikanResponse;
 	let upcomingAnimes: JikanResponse;
 
-	// const sections = await getCachedSections();
-	// if (sections !== undefined) {
-	//   airingAnimes = sections.airingAnimes;
-	//   popularAnimes = sections.popularAnimes;
-	//   upcomingAnimes = sections.upcomingAnimes;
-	//   console.log("got cache");
-	// } else {
 	const jikan = new Jikan();
 	// show the top airing, top animes, and top upcoming animes
 	const sections = await Promise.all([
@@ -142,32 +135,20 @@ export const getStaticProps: GetStaticProps = async () => {
 	popularAnimes = sections[1];
 	upcomingAnimes = sections[2];
 
-	//   await redis.setEx(
-	//     "sections-1",
-	//     60 * 60 * 24,
-	//     JSON.stringify({
-	//       airingAnimes: sections[0],
-	//       popularAnimes: sections[1],
-	//       upcomingAnimes: sections[2],
-	//     })
-	//   );
-	//   console.log("cache saved");
-	// }
-
 	// limit the amount of data is being sent
 	// only need the first 12 of each
 	const airing: JikanPreview[] = airingAnimes.data
-		.filter((anime, idx) => idx > 12)
+		.filter((anime, idx) => idx < 12)
 		.map(({ title, mal_id, images }) => {
 			return { title, mal_id, image: images.webp.image_url };
 		});
 	const popular: JikanPreview[] = popularAnimes.data
-		.filter((anime, idx) => idx > 12)
+		.filter((anime, idx) => idx < 12)
 		.map(({ title, mal_id, images }) => {
 			return { title, mal_id, image: images.webp.image_url };
 		});
 	const upcoming: JikanPreview[] = upcomingAnimes.data
-		.filter((anime, idx) => idx > 12)
+		.filter((anime, idx) => idx < 12)
 		.map(({ title, mal_id, images }) => {
 			return { title, mal_id, image: images.webp.image_url };
 		});
