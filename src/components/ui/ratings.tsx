@@ -34,7 +34,7 @@ export default function Ratings({ readOnly, value }: RatingsProps) {
 								setRating(0);
 							}
 						}}
-						fill={num <= rating ? "gold" : ""}
+						fill={num <= rating ? "gold" : "transparent"}
 					/>
 				);
 			})}
