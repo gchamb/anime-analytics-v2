@@ -33,7 +33,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 							<h4>Genres</h4>
 							<div className="flex gap-1 flex-wrap justify-center">
 								{getGenres(anime).map((genre, idx) => {
-									return <Chip key={idx} text={genre} />;
+									return <Chip size="sm" key={idx} text={genre} />;
 								})}
 							</div>
 						</div>
@@ -44,7 +44,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 							<h4>Studios</h4>
 							<div className="flex gap-1 flex-wrap justify-center">
 								{anime.studios.map((studio, idx) => {
-									return <Chip key={idx} text={studio.name} />;
+									return <Chip size="sm" key={idx} text={studio.name} />;
 								})}
 							</div>
 						</div>
@@ -53,7 +53,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 					<div>
 						<h4>Aired In</h4>
 						<div className="flex gap-1 flex-wrap justify-center">
-							<Chip text={anime.year?.toString() ?? "N/A"} />
+							<Chip size="sm" text={anime.year?.toString() ?? "N/A"} />
 						</div>
 					</div>
 				</div>
