@@ -9,11 +9,17 @@ function BackButton() {
 
 	return (
 		<div className="flex flex-col">
-			<div className="flex items-center gap-2 cursor-pointer hover:text-aa-4 dark:hover:text-aa-3">
-				<ArrowLeft onClick={() => router.back()} />
+			<div
+				className="flex items-center gap-2 cursor-pointer hover:text-aa-4 dark:hover:text-aa-3"
+				onClick={() => router.back()}
+			>
+				<ArrowLeft />
 				<span className="text-sm">Back</span>
 			</div>
-			<Link href="/" className="self-end text-xs hover:text-aa-4 hover:underline hover:underline-offset-2 dark:hover:text-aa-3">
+			<Link
+				href="/"
+				className="self-end text-xs hover:text-aa-4 hover:underline hover:underline-offset-2 dark:hover:text-aa-3"
+			>
 				or back to home
 			</Link>
 		</div>
