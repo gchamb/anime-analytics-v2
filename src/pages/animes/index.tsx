@@ -180,7 +180,7 @@ export default function Animes() {
 						<SelectItem value="all">All</SelectItem>
 						<SelectItem value="1-12">1-12</SelectItem>
 						<SelectItem value="12-24">12-24</SelectItem>
-						<SelectItem value="24+">12+</SelectItem>
+						<SelectItem value="24+">24+</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>

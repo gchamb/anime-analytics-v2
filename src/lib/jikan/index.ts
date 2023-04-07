@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { JikanAnime, JikanDays, JikanOption, JikanResponse } from "./types";
+import { JikanAnime, JikanAnimeGenres, JikanDays, JikanGenresMap, JikanOption, JikanResponse, JikanStatus } from "./types";
 
 export default class Jikan {
   private readonly instance: AxiosInstance;
@@ -27,10 +27,10 @@ export default class Jikan {
       .data;
   }
 
-  async search(q: string, page = 1): Promise<JikanResponse> {
+  async search(q: string, status: JikanStatus | undefined, genres: JikanAnimeGenres[], page = 1): Promise<JikanResponse> {
     return (
       await this.instance.get(
-        `/anime?q=${q.split(" ").join("+")}&page=${page}&sfw=true`
+        `/anime?q=${q.split(" ").join("+")}${status !== undefined ? `&status=${status}` : ''}&genres=${genres.map(genre => JikanGenresMap[genre]).join(',')}&page=${page}&sfw=true`
       )
     ).data;
   }
