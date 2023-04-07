@@ -62,6 +62,8 @@ export type JikanAnime = {
   demographics: JikanDemographics[];
 };
 
+export type JikanStatus = "airing" | "complete" | "upcoming";
+
 export const DAYS = [
   "sunday",
   "monday",
@@ -79,3 +81,45 @@ export type JikanPreview = {
   image: string;
   title: string;
 };
+
+export const JikanGenresMap = {
+  "Action": 1,
+  "Adventure": 2,
+  "Avant Garde": 5,
+  "Award Winning": 46,
+  "Boys Love": 28,
+  "Comedy": 4,
+  "Drama": 8,
+  "Fantasy": 10,
+  "Girls Love": 26,
+  "Gourmet": 47,
+  "Horror": 4,
+  "Mystery": 7,
+  "Romance": 22,
+  "Sci-Fi": 24,
+  "Slice of Life": 36,
+  "Sports": 30,
+  "Supernatural": 37,
+  "Suspense": 41,
+  "Ecchi": 9
+} as const;
+
+export const jikanAnimeGenres = Object.keys(JikanGenresMap) as JikanAnimeGenres[];
+
+export type JikanAnimeGenres = keyof typeof JikanGenresMap;
+
+export const isJikanAnimeGenreArray = (data: string[]): data is JikanAnimeGenres[] => {
+  if (data.length === 0) {
+    return false;
+  }
+
+  for (const item of data) {
+    if (item in JikanGenresMap === false) {
+      return false;
+    }
+  }
+
+
+
+  return true;
+}

@@ -16,6 +16,9 @@ module.exports = {
 				"aa-dark-1": "#291f33",
 				"aa-dark-2": "#3e2f4c",
 			},
+			gridTemplateRows: {
+				".20": "0.2fr 1fr",
+			},
 		},
 	},
 	plugins: [require("tailwindcss-animate")],
