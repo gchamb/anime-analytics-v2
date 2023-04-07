@@ -4,11 +4,9 @@ import AnimeCover from "@/components/anime-cover";
 import Image from "next/image";
 import Jikan from "@/lib/jikan";
 import Link from "next/link";
-import redis from "@/server/redis";
 
 import { GetStaticProps } from "next/types";
 import { JikanPreview, JikanResponse } from "@/lib/jikan/types";
-import { getCachedSections } from "@/server/caches";
 import { ArrowRight } from "lucide-react";
 
 const Home: React.FC<{
@@ -105,19 +103,6 @@ const Home: React.FC<{
 
 export default Home;
 
-function timeUntilMidnight(): number {
-	const now = new Date();
-	const midnight = new Date();
-	midnight.setDate(now.getDate() + 1);
-	midnight.setHours(0);
-	midnight.setMinutes(0);
-	midnight.setSeconds(0);
-	midnight.setMilliseconds(0);
-
-	const timeUntilInMs = midnight.getTime() - now.getTime();
-	return Math.floor(timeUntilInMs / 1000);
-}
-
 export const getStaticProps: GetStaticProps = async () => {
 	let airingAnimes: JikanResponse;
 	let popularAnimes: JikanResponse;
@@ -158,7 +143,7 @@ export const getStaticProps: GetStaticProps = async () => {
 			airing,
 			popular,
 			upcoming,
-			revalidate: timeUntilMidnight(),
+			revalidate: 86400,
 		},
 	};
 };
