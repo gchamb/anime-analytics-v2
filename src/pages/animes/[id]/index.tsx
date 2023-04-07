@@ -79,7 +79,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 	);
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
 	if (params === undefined) {
 		return {
 			notFound: true,
@@ -94,6 +94,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	}
 
 	// make sure to cache this page for a day
+	// make sure to cache this page for a week this data doesn't change often
+	res.setHeader("Cache-Control", "public, s-maxage=604800 stale-while-revalidate=691200");
 
 	const { data: anime } = await jikan.getAnime(malId);
 
