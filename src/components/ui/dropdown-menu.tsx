@@ -63,7 +63,7 @@ const DropdownMenuContent = React.forwardRef<
 			ref={ref}
 			sideOffset={sideOffset}
 			className={cn(
-				"animate-in data-[side=right]:slide-in-from-left-2 data-[side=left]:slide-in-from-right-2 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden rounded-md border border-aa-1 bg-aa-1 p-1 text-black shadow-md dark:border-aa-3 dark:bg-aa-dark-1 dark:text-aa-3",
+				"animate-in data-[side=right]:slide-in-from-left-2 data-[side=left]:slide-in-from-right-2 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden rounded-md  bg-aa-1 p-1 text-black shadow-md  dark:bg-aa-dark-1 dark:text-aa-3",
 				className
 			)}
 			{...props}
@@ -97,7 +97,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 	<DropdownMenuPrimitive.CheckboxItem
 		ref={ref}
 		className={cn(
-			"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm font-medium outline-none focus:bg-aa-1 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-aa-3",
+			"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm font-medium outline-none focus:bg-aa-0 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-aa-dark-2",
 			className
 		)}
 		checked={checked}
