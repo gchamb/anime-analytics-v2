@@ -6,7 +6,6 @@ import useSwr from "swr";
 import { FullScreen } from "@/components/full-screen";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSearchAnimes } from "@/hooks/jikan";
 import { getGenresQuery, getQuery, getStatusQuery, pageQuery } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
@@ -30,7 +29,7 @@ export default function Browse() {
 	const [genres, setGenres] = useState<JikanAnimeGenres[]>(getGenresQuery());
 
 	const router = useRouter();
-	
+
 	const fetchKey = `${jikan.getEndpoint("search")}?q=${getQuery().split(" ").join("+")}${
 		getStatusQuery() !== undefined ? `&status=${getStatusQuery()}` : ""
 	}&genres=${getGenresQuery()
