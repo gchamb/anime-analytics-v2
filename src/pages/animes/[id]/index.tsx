@@ -2,13 +2,11 @@ import AnimeCover from "@/components/anime-cover";
 import Chip from "@/components/ui/chip";
 import ListButton from "@/components/ui/list-button";
 import Ratings from "@/components/ui/ratings";
-import Jikan from "@/lib/jikan";
+import { Jikan } from "@/lib/jikan";
 
 import { JikanAnime } from "@/lib/jikan/types";
 import { getGenres } from "@/lib/utils";
 import { GetServerSideProps } from "next";
-
-const jikan = new Jikan();
 
 export default function Anime({ anime }: { anime: JikanAnime }) {
 	return (
@@ -97,6 +95,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
 	// make sure to cache this page for a week this data doesn't change often
 	res.setHeader("Cache-Control", "public, s-maxage=604800 stale-while-revalidate=691200");
 
+	const jikan = new Jikan();
 	const { data: anime } = await jikan.getAnime(malId);
 
 	return {

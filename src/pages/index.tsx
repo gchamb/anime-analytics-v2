@@ -2,9 +2,9 @@ import Head from "next/head";
 import React from "react";
 import AnimeCover from "@/components/anime-cover";
 import Image from "next/image";
-import Jikan from "@/lib/jikan";
 import Link from "next/link";
 
+import { Jikan } from "@/lib/jikan";
 import { GetStaticProps } from "next/types";
 import { JikanPreview, JikanResponse } from "@/lib/jikan/types";
 import { ArrowRight } from "lucide-react";

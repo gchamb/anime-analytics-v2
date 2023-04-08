@@ -1,6 +1,7 @@
 import AnimeResults from "@/components/anime-results";
 import Pagination from "@/components/pagination";
 import Chip from "@/components/ui/chip";
+import useSwr from "swr";
 
 import { FullScreen } from "@/components/full-screen";
 import { Button } from "@/components/ui/button";
@@ -19,16 +20,25 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { JikanAnimeGenres, jikanAnimeGenres } from "@/lib/jikan/types";
+import { JikanAnimeGenres, JikanGenresMap, JikanResponse, jikanAnimeGenres } from "@/lib/jikan/types";
+import { jikan } from "@/lib/jikan";
+
+const fetcher = (url: string): Promise<JikanResponse> => fetch(url).then((res) => res.json());
 
 export default function Browse() {
 	const [inputQuery, setInputQuery] = useState(getQuery());
 	const [genres, setGenres] = useState<JikanAnimeGenres[]>(getGenresQuery());
 
 	const router = useRouter();
-	const { loading, data, error } = useSearchAnimes(getQuery(), getStatusQuery(), getGenresQuery(), pageQuery());
-	// console.log(genres);
-	if (loading) {
+	
+	const fetchKey = `${jikan.getEndpoint("search")}?q=${getQuery().split(" ").join("+")}${
+		getStatusQuery() !== undefined ? `&status=${getStatusQuery()}` : ""
+	}&genres=${getGenresQuery()
+		.map((genre) => JikanGenresMap[genre])
+		.join(",")}&page=${pageQuery()}&sfw=true`;
+	const { data, error, isLoading } = useSwr(fetchKey, fetcher);
+
+	if (isLoading) {
 		return (
 			<FullScreen>
 				<Loader2 className="w-20 h-20 animate-spin text-aa-2 dark:text-aa-3" />
@@ -36,7 +46,7 @@ export default function Browse() {
 		);
 	}
 
-	if (error !== "") {
+	if (error) {
 		return (
 			<FullScreen>
 				<div>

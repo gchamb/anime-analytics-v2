@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { JikanAnime, JikanAnimeGenres, JikanDays, JikanGenresMap, JikanOption, JikanResponse, JikanStatus } from "./types";
 
-export default class Jikan {
+export class Jikan {
   private readonly instance: AxiosInstance;
   constructor() {
     this.instance = axios.create({
@@ -38,4 +38,19 @@ export default class Jikan {
   async getAnime(mal_id: number): Promise<{ data: JikanAnime }> {
     return (await this.instance.get(`/anime/${mal_id}`)).data;
   }
+
+  getEndpoint(type: "top" | "day" | "search" | "anime"): string {
+    switch (type) {
+      case "anime":
+        return this.instance.getUri() + "/anime/";
+      case "search":
+        return this.instance.getUri() + "/anime";
+      case "top":
+        return this.instance.getUri() + "/top/anime";
+      case "day":
+        return this.instance.getUri() + "/schedules";
+    }
+  }
 }
+
+export const jikan = new Jikan();

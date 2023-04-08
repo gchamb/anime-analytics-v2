@@ -1,14 +1,18 @@
 import AnimeResults from "@/components/anime-results";
 import React, { useMemo, useState } from "react";
 import Pagination from "@/components/pagination";
+import useSwr from "swr";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useSectionAnimes } from "@/hooks/jikan";
-import { isSection } from "@/lib/types";
-import { getGenres, pageQuery } from "@/lib/utils";
+import { Sections, isSection } from "@/lib/types";
+import { getGenres, getTypeQuery, pageQuery } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { FullScreen } from "@/components/full-screen";
+import { JikanResponse } from "@/lib/jikan/types";
+import { jikan } from "@/lib/jikan";
+
+const fetcher = async (url: string): Promise<JikanResponse> => fetch(url).then((res) => res.json());
 
 export default function Animes() {
 	const [filters, setFilters] = useState<{
@@ -20,10 +24,10 @@ export default function Animes() {
 	});
 
 	const router = useRouter();
-	const { loading, data, error } = useSectionAnimes(
-		typeof router.query.type === "string" ? router.query.type : "",
-		pageQuery()
-	);
+	const fetchKey = `${jikan.getEndpoint("top")}?type=${getTypeQuery()}&filter=${
+		Sections[getTypeQuery()]
+	}&page=${pageQuery()}`;
+	const { data, error, isLoading } = useSwr(fetchKey, fetcher);
 
 	const filteredData = useMemo(() => {
 		let filteredAnimes = data?.data;
@@ -68,7 +72,7 @@ export default function Animes() {
 		}
 	};
 
-	if (loading) {
+	if (isLoading) {
 		return (
 			<FullScreen>
 				<Loader2 className="w-20 h-20 animate-spin text-aa-2 dark:text-aa-3" />
@@ -76,11 +80,11 @@ export default function Animes() {
 		);
 	}
 
-	if (error !== "") {
+	if (error) {
 		return (
 			<FullScreen>
 				<div>
-					<h1 className="text-3xl font-bold">{error}</h1>
+					<h1 className="text-3xl font-bold">{error instanceof Error ? error.message : String(error)}</h1>
 					<p>Try to refresh</p>
 				</div>
 			</FullScreen>
@@ -113,7 +117,7 @@ export default function Animes() {
 		<div className="grid w-11/12 max-w-[1280px] md:w-2/3 m-auto">
 			<div className="grid grid-cols-3 justify-center gap-x-3 p-5">
 				<Select
-					value={typeof router.query.type === "string" ? router.query.type : ""}
+					value={getTypeQuery()}
 					onValueChange={(value) => {
 						if (!isSection(value)) {
 							return;

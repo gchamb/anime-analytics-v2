@@ -2,6 +2,7 @@ import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { JikanAnime } from "./jikan/types";
 import { JikanAnimeGenres, isJikanAnimeGenreArray } from "./jikan/types";
+import { Sections, isSection } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -117,4 +118,26 @@ export const getStatusQuery = (): "airing" | "complete" | "upcoming" | undefined
 
 
   return status;
+}
+
+export const getTypeQuery = (): keyof typeof Sections => {
+
+  if (typeof window === "undefined") {
+    return "airing";
+  }
+
+  const url = new URL(window.location.href);
+
+  const type = url.searchParams.get("type");
+
+  if (type === null) {
+    return "airing";
+  }
+
+  if (!isSection(type)) {
+    return "airing"
+  }
+
+
+  return type;
 }
