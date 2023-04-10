@@ -63,7 +63,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 				}`}
 			>
 				{anime.trailer.embed_url !== null && (
-					<iframe className="hidden aspect-video md:block" src={anime.trailer.embed_url} />
+					<iframe className="hidden aspect-video md:block object-cover" src={anime.trailer.embed_url} />
 				)}
 
 				{anime.synopsis !== null && (
