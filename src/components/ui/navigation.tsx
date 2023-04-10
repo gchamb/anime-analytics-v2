@@ -33,7 +33,6 @@ export default function Navigation() {
 		<nav className="flex w-11/12 m-auto items-center p-2">
 			<div>
 				{router.pathname !== "/" && (
-					// <ArrowLeft className="cursor-pointer hover:text-aa-4" onClick={() => router.back()} />
 					<BackButton />
 				)}
 			</div>

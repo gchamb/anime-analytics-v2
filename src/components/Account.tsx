@@ -14,9 +14,9 @@ export default function Account() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<User className="cursor-pointer hover:text-aa-4 dark:hover:text-aa-3" />
+				<User className="cursor-pointer text-black dark:text-white hover:text-aa-4 dark:hover:text-aa-3" />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent>
+			<DropdownMenuContent align="end">
 				<DropdownMenuLabel className="text-center text-black dark:text-white">My Account</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="flex gap-2 text-black dark:text-white">
