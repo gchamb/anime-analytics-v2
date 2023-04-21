@@ -10,8 +10,8 @@ const inter = Inter({ subsets: ["latin"] });
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
 		<main className={`${inter.className} h-screen`}>
-			<Navigation />
 			<SessionProvider session={session}>
+				<Navigation />
 				<Component {...pageProps} />
 			</SessionProvider>
 		</main>

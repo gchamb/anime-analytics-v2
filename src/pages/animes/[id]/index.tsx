@@ -7,8 +7,10 @@ import { Jikan } from "@/lib/jikan";
 import { JikanAnime } from "@/lib/jikan/types";
 import { getGenres } from "@/lib/utils";
 import { GetServerSideProps } from "next";
+import { useSession } from "next-auth/react";
 
 export default function Anime({ anime }: { anime: JikanAnime }) {
+	const { status } = useSession();
 	return (
 		<div className="w-11/12 h-max m-auto flex flex-col items-center pt-3 gap-5 lg:flex-row">
 			<div className="flex flex-col gap-y-4 items-center text-center lg:w-1/2 lg:m-auto">
@@ -23,7 +25,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 					</div>
 				)}
 
-				<ListButton onListClicked={(list) => console.log(list)} />
+				{status === "authenticated" && <ListButton onListClicked={(list) => console.log(list)} />}
 
 				<div className="grid grid-flow-col auto-cols-fr justify-between gap-2">
 					{getGenres(anime).length > 0 && (

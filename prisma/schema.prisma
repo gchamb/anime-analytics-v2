@@ -54,9 +54,11 @@ model List {
 
 model User {
   id            String    @id @default(cuid())
-  name          String?
+  name          String?   
   email         String?   @unique
   emailVerified DateTime?
+  username      String?   @unique
+  image         String?
   lists         List[]
   accounts      Account[]
   sessions      Session[]
