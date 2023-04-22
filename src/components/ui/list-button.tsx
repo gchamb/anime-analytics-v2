@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type ListButtonProps = {
-	showDelete?: true;
-	onListClicked: (list: ListType) => void;
+	handleListRequest: (list: ListType) => void;
+	hide: ListType[];
 };
 
 export default function ListButton(props: ListButtonProps) {
@@ -24,7 +24,7 @@ export default function ListButton(props: ListButtonProps) {
 			<Button
 				className="rounded-r-none focus:ring-0 focus:ring-offset-0"
 				variant="subtle"
-				onClick={() => props.onListClicked(selectedList)}
+				onClick={() => props.handleListRequest(selectedList)}
 			>
 				{selectedList.toUpperCase()} LIST
 			</Button>
@@ -39,7 +39,7 @@ export default function ListButton(props: ListButtonProps) {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{listType.map((list, idx) => {
-						if (props.showDelete === undefined && list === "delete") {
+						if (props.hide.includes(list)) {
 							return <React.Fragment key={idx}></React.Fragment>;
 						}
 
