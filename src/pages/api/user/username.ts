@@ -1,5 +1,5 @@
 import prisma from '@/server/prisma';
-import { isValidUsername } from '@/types/validators';
+import { isValidUsername } from '@/lib/types/validators';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]';
