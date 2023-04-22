@@ -42,7 +42,7 @@ model List {
   animeName   String
   animeGenres Json   @db.Json
   episodes    Int?
-  yearReleased Int
+  yearReleased Int?
   studio      String
   imageUrl    String
   listType    String
