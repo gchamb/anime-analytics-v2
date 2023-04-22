@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { isValidUsername } from "@/types/validators";
+import { isValidUsername } from "@/lib/types/validators";
 
 async function updateUsername(url: string, { arg }: { arg: string }) {
 	return fetch(url, {
@@ -16,7 +16,7 @@ async function updateUsername(url: string, { arg }: { arg: string }) {
 }
 
 export default function UsernameDialog(props: { open: boolean; onClose: () => void }) {
-	const { trigger, error: mutateError, data } = useSWRMutation("/api/user/username", updateUsername);
+	const { trigger } = useSWRMutation("/api/user/username", updateUsername);
 	const [username, setUsername] = useState("");
 	const [error, setError] = useState("");
 
@@ -28,28 +28,16 @@ export default function UsernameDialog(props: { open: boolean; onClose: () => vo
 		}
 
 		// make api request to save username
-		await trigger(username.trim());
+		const response = await trigger(username.trim());
+		if (response !== undefined) {
+			if (!response.ok) {
+				const { error } = (await response.json()) as { error: string };
+				setError(error);
+			} else {
+				props.onClose();
+			}
+		}
 	};
-
-	useEffect(() => {
-		const checkForErrors = async () => {
-			// check the errors
-			if (data !== undefined) {
-				if (!data.ok) {
-					const { error } = (await data.json()) as { error: string };
-					setError(error);
-				} else {
-					props.onClose();
-				}
-			}
-
-			if (mutateError !== undefined) {
-				setError(mutateError instanceof Error ? mutateError.message : String(mutateError));
-			}
-		};
-
-		checkForErrors();
-	}, [mutateError, data]);
 
 	return (
 		<Dialog open={props.open}>
