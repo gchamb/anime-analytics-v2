@@ -21,7 +21,7 @@ export const AnimeListRequestSchema = z.object({
     animeGenres: z.string().array(),
     episodes: z.number().int().nullable(),
     yearReleased: z.number().int().nullable(),
-    studio: z.string(),
+    studio: z.string().nullable(),
     imageUrl: z.string(),
     rate: z.number().int().min(0).max(5).optional(),
     ratedAt: z.string().datetime().optional(),
@@ -76,7 +76,7 @@ export function formulateAnimeListRequest(anime: JikanAnime, list: AnimeListRequ
         animeGenres: getGenres(anime),
         episodes: anime.episodes,
         yearReleased: anime.year,
-        studio: anime.studios[0].name,
+        studio: anime.studios.length > 0 ? anime.studios[0].name : null,
         imageUrl: anime.images.webp.image_url,
         listRequestType: list,
     }

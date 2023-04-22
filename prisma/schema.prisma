@@ -43,7 +43,7 @@ model List {
   animeGenres Json   @db.Json
   episodes    Int?
   yearReleased Int?
-  studio      String
+  studio      String?
   imageUrl    String
   listType    String
   rate        Float?
