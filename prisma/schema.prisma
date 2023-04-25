@@ -39,6 +39,7 @@ model Session {
 
 model List {
   id          String @id @default(cuid())
+  malId       Int    @unique
   animeName   String
   animeGenres Json   @db.Json
   episodes    Int?
@@ -47,7 +48,8 @@ model List {
   imageUrl    String
   listType    String
   rate        Float?
-  ratedAt     DateTime?
+  month       String?
+  year        Int?
   user        User @relation(fields: [userId], references: [id])
   userId      String 
 }

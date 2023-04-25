@@ -4,6 +4,7 @@ import { AuthOptions, getServerSession } from 'next-auth';
 import { authOptions } from './auth/[...nextauth]';
 import { AnimeListRequestSchema, BasicListRequestSchema, PutListRequestSchema, isListType } from '@/lib/types';
 import { Session } from 'next-auth/core/types';
+import { getTranformedDate } from '@/lib/utils';
 
 type SessionType = Awaited<ReturnType<typeof getServerSession<AuthOptions, Session>>>;
 
@@ -30,30 +31,30 @@ export default async function listHandler(
 
 
         switch (req.method) {
-            case "GET":
-                if (!isListType(list) || list === "delete") {
-                    return res.status(400).json({ error: "Invalid Request Body" });
-                }
+            // case "GET":
+            //     if (!isListType(list) || list === "delete") {
+            //         return res.status(400).json({ error: "Invalid Request Body" });
+            //     }
 
-                const user = await prisma.user.findUnique({ where: { username } })
+            //     const user = await prisma.user.findUnique({ where: { username } })
 
-                if (user === null) {
-                    return res.status(400).json({ error: "Invalid Request Body" });
-                }
+            //     if (user === null) {
+            //         return res.status(400).json({ error: "Invalid Request Body" });
+            //     }
 
-                const page = Number(queryPage);
-                if (isNaN(page)) {
-                    return res.status(400).json({ error: "Invalid Page Parameter" });
-                }
+            //     const page = Number(queryPage);
+            //     if (isNaN(page)) {
+            //         return res.status(400).json({ error: "Invalid Page Parameter" });
+            //     }
 
-                const skip = page - 1 === 0 ? 1 : page - 1 * LIST_MAX;
-                const userList = await prisma.list.findMany({ where: { userId: user.id }, skip, take: LIST_MAX });
+            //     const skip = page - 1 === 0 ? 1 : page - 1 * LIST_MAX;
+            //     const userList = await prisma.list.findMany({ where: { userId: user.id }, skip, take: LIST_MAX });
 
-                const specificList = userList.filter((listRec) => list === listRec.listType).map(({ userId, ...rec }) => {
-                    return rec;
-                });
+            //     const specificList = userList.filter((listRec) => list === listRec.listType).map(({ userId, ...rec }) => {
+            //         return rec;
+            //     });
 
-                return res.status(200).json(specificList);
+            //     return res.status(200).json(specificList);
             case "POST":
                 handleAuthenticatedUsers(res, session);
 
@@ -80,9 +81,11 @@ export default async function listHandler(
                     if (parsedPostData.rate === undefined || parsedPostData.ratedAt === undefined) {
                         return res.status(400).json({ error: "Invalid Request Body" });
                     }
+                    const { month, year } = getTranformedDate(new Date(parsedPostData.ratedAt));
 
                     await prisma.list.create({
                         data: {
+                            malId: parsedPostData.malId,
                             animeName: parsedPostData.animeName,
                             animeGenres: parsedPostData.animeGenres,
                             episodes: parsedPostData.episodes,
@@ -90,8 +93,8 @@ export default async function listHandler(
                             studio: parsedPostData.studio,
                             imageUrl: parsedPostData.imageUrl,
                             listType: parsedPostData.listRequestType,
-                            rate: parsedPostData.rate,
-                            ratedAt: parsedPostData.ratedAt,
+                            month,
+                            year,
                             userId: session!.user.id
                         }
                     })
@@ -99,6 +102,7 @@ export default async function listHandler(
                 } else {
                     await prisma.list.create({
                         data: {
+                            malId: parsedPostData.malId,
                             animeName: parsedPostData.animeName,
                             animeGenres: parsedPostData.animeGenres,
                             episodes: parsedPostData.episodes,
@@ -122,6 +126,14 @@ export default async function listHandler(
 
                 const { data: parsedPutData } = parsePut;
 
+                const list = await prisma.list.findUnique({
+                    where: { id: parsedPutData.id }
+                })
+
+                if (list === null) {
+                    return res.status(400).json({ error: "List record doesn't exist" });
+                }
+
                 if (parsedPutData.updating === undefined) {
                     await prisma.list.update({
                         where: {
@@ -132,13 +144,15 @@ export default async function listHandler(
                         }
                     })
                 } else {
+                    const { month, year } = getTranformedDate(new Date(parsedPutData.updating.ratedAt ?? ""))
                     await prisma.list.update({
                         where: {
                             id: parsedPutData.id,
                         },
                         data: {
                             rate: parsedPutData.updating.rate,
-                            ratedAt: parsedPutData.updating.ratedAt,
+                            month: parsedPutData.updating.ratedAt !== undefined ? month : list.month,
+                            year: parsedPutData.updating.ratedAt !== undefined ? year : list.year,
                         }
                     })
                 }
