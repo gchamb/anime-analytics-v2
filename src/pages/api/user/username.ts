@@ -21,34 +21,35 @@ export default async function usernameHandler(
         return res.status(400).json({ error: isValid.reason })
     }
 
-    // make sure the session is valid
-    const session = await getServerSession(req, res, authOptions);
-    if (session === null) {
-        // The user is not authenticated, return an error response
-        return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    const usernameExist = await prisma.user.findUnique({
-        where: {
-            username,
+    try {
+        // make sure the session is valid
+        const session = await getServerSession(req, res, authOptions);
+        if (session === null) {
+            // The user is not authenticated, return an error response
+            return res.status(401).json({ error: "Unauthorized" });
         }
-    })
 
-    if (usernameExist !== null) {
-        return res.status(400).json({ error: "Username already exist." })
-    }
+        const usernameExist = await prisma.user.findUnique({
+            where: {
+                username,
+            }
+        })
 
-    await prisma.user.update({
-        where: {
-            email: session.user.email
-        },
-        data: {
-            username,
+        if (usernameExist !== null) {
+            return res.status(400).json({ error: "Username already exist." })
         }
-    }).catch((err) => {
-        return res.status(500).json({ error: err instanceof Error ? err.message : String(err) })
-    })
 
+        await prisma.user.update({
+            where: {
+                email: session.user.email
+            },
+            data: {
+                username,
+            }
+        })
 
-    return res.status(200).end();
+        return res.status(200).end();
+    } catch (err) {
+        return res.status(400).json({ error: err instanceof Error ? err.message : String(err) })
+    }
 }
