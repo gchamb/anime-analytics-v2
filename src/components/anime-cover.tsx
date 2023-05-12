@@ -23,7 +23,7 @@ export default function AnimeCover({ image, name, showFull, animeView }: AnimeCo
 					<AspectRatio ratio={2 / 3}>
 						<Image src={image} alt={`${name} image poster`} fill className="rounded-md object-cover" />
 					</AspectRatio>
-					{showFull ? <span>{name}</span> : <span>{name.length < 30 ? name : name.substring(0, 30)}</span>}
+					{showFull ? <span>{name}</span> : <span>{name.length < 30 ? name : `${name.substring(0, 30)}... `}</span>}
 				</>
 			)}
 		</div>
