@@ -20,41 +20,39 @@ export default async function listHandler(
     res: NextApiResponse
 ) {
     try {
-        const LIST_MAX = 20;
+        const LIST_MAX = 18;
         const session = await getServerSession(req, res, authOptions);
 
-        let { username, listData } = req.body;
-        const { page: queryPage, list } = req.query;
-
-
-
-
+        let { listData } = req.body;
+        const { page: queryPage, list, username } = req.query;
 
         switch (req.method) {
-            // case "GET":
-            //     if (!isListType(list) || list === "delete") {
-            //         return res.status(400).json({ error: "Invalid Request Body" });
-            //     }
+            case "GET":
+                if (typeof username !== "string" || list === undefined || !isListType(list) || list === "delete") {
+                    return res.status(400).json({ error: "Invalid Request Body" });
+                }
 
-            //     const user = await prisma.user.findUnique({ where: { username } })
+                const user = await prisma.user.findUnique({ where: { username } })
 
-            //     if (user === null) {
-            //         return res.status(400).json({ error: "Invalid Request Body" });
-            //     }
+                if (user === null) {
+                    return res.status(400).json({ error: "Invalid Request Body" });
+                }
 
-            //     const page = Number(queryPage);
-            //     if (isNaN(page)) {
-            //         return res.status(400).json({ error: "Invalid Page Parameter" });
-            //     }
+                const page = Number(queryPage);
+                if (isNaN(page)) {
+                    return res.status(400).json({ error: "Invalid Page Parameter" });
+                }
 
-            //     const skip = page - 1 === 0 ? 1 : page - 1 * LIST_MAX;
-            //     const userList = await prisma.list.findMany({ where: { userId: user.id }, skip, take: LIST_MAX });
+                const skip = (page - 1) * LIST_MAX;
 
-            //     const specificList = userList.filter((listRec) => list === listRec.listType).map(({ userId, ...rec }) => {
-            //         return rec;
-            //     });
+                const userList = await prisma.list.findMany({ where: { userId: user.id, listType: list }, skip, take: LIST_MAX });
+                const listCount = await prisma.list.count({ where: { userId: user.id, listType: list } })
 
-            //     return res.status(200).json(specificList);
+                const specificList = userList.map(({ userId, ...rec }) => {
+                    return rec;
+                });
+
+                return res.status(200).json({ list: specificList, pages: Math.ceil(listCount / LIST_MAX) });
             case "POST":
                 handleAuthenticatedUsers(res, session);
 
@@ -93,6 +91,7 @@ export default async function listHandler(
                             studio: parsedPostData.studio,
                             imageUrl: parsedPostData.imageUrl,
                             listType: parsedPostData.listRequestType,
+                            rate: parsedPostData.rate,
                             month,
                             year,
                             userId: session!.user.id
@@ -126,11 +125,11 @@ export default async function listHandler(
 
                 const { data: parsedPutData } = parsePut;
 
-                const list = await prisma.list.findUnique({
+                const listItem = await prisma.list.findUnique({
                     where: { id: parsedPutData.id }
                 })
 
-                if (list === null) {
+                if (listItem === null) {
                     return res.status(400).json({ error: "List record doesn't exist" });
                 }
 
@@ -151,8 +150,8 @@ export default async function listHandler(
                         },
                         data: {
                             rate: parsedPutData.updating.rate,
-                            month: parsedPutData.updating.ratedAt !== undefined ? month : list.month,
-                            year: parsedPutData.updating.ratedAt !== undefined ? year : list.year,
+                            month: parsedPutData.updating.ratedAt !== undefined ? month : listItem.month,
+                            year: parsedPutData.updating.ratedAt !== undefined ? year : listItem.year,
                         }
                     })
                 }

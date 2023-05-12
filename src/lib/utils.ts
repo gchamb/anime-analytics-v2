@@ -2,7 +2,7 @@ import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { JikanAnime } from "./jikan/types";
 import { JikanAnimeGenres, isJikanAnimeGenreArray } from "./jikan/types";
-import { Sections, isSection } from "./types";
+import { Months, Sections, isSection, months } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,6 +24,16 @@ export function getGenres(animes: JikanAnime[] | JikanAnime): string[] {
   }
 
   return Array(...currentGenres);
+}
+
+export function getEpisodeGroup(episodes: number): "0-12" | "12-24" | "24+" {
+  if (episodes >= 1 && episodes <= 12) {
+    return "0-12";
+  } else if (episodes >= 12 && episodes <= 24) {
+    return "12-24";
+  } else {
+    return "24+";
+  }
 }
 
 export function pageQuery(): number {
@@ -140,4 +150,15 @@ export const getTypeQuery = (): keyof typeof Sections => {
 
 
   return type;
+}
+
+
+
+export const getTranformedDate = (date: Date): { year: number; month: Months } => {
+  return { year: date.getFullYear(), month: months[date.getMonth()] }
+}
+
+export function properCase(name: string) {
+  const firstChar = name.charAt(0).toUpperCase();
+  return firstChar + name.substring(1, name.length).toLowerCase();
 }
