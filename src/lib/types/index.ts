@@ -32,8 +32,7 @@ export const PutListRequestSchema = z.object({
         rate: z.number().int().min(0).max(5).optional(),
         ratedAt: z.string().datetime().optional(),
     }).optional(),
-    listRequestType: z.union([z.literal(listType[0]), z.literal(listType[1])])
-}).merge(BasicListRequestSchema.omit({ listRequestType: true }));
+}).merge(BasicListRequestSchema);
 
 export type BasicListRequest = z.infer<typeof BasicListRequestSchema>;
 export type AnimeListRequest = z.infer<typeof AnimeListRequestSchema>
