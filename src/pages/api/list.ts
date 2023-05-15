@@ -134,6 +134,10 @@ export default async function listHandler(
                 }
 
                 if (parsedPutData.updating === undefined) {
+                    if (parsedPutData.listRequestType === "rate") {
+                        return res.status(400).json({ error: "Updating field is undefined." });
+                    }
+
                     await prisma.list.update({
                         where: {
                             id: parsedPutData.id,
@@ -149,6 +153,7 @@ export default async function listHandler(
                             id: parsedPutData.id,
                         },
                         data: {
+                            listType: "rate",
                             rate: parsedPutData.updating.rate,
                             month: parsedPutData.updating.ratedAt !== undefined ? month : listItem.month,
                             year: parsedPutData.updating.ratedAt !== undefined ? year : listItem.year,
