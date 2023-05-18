@@ -2,7 +2,7 @@ import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { JikanAnime } from "./jikan/types";
 import { JikanAnimeGenres, isJikanAnimeGenreArray } from "./jikan/types";
-import { Months, Sections, isSection, months } from "./types";
+import { Months, Sections, isSection, monthsSchema } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -155,7 +155,7 @@ export const getTypeQuery = (): keyof typeof Sections => {
 
 
 export const getTranformedDate = (date: Date): { year: number; month: Months } => {
-  return { year: date.getFullYear(), month: months[date.getMonth()] }
+  return { year: date.getFullYear(), month: monthsSchema.options[date.getMonth()].value }
 }
 
 export function properCase(name: string) {
