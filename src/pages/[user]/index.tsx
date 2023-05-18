@@ -1,16 +1,13 @@
 import useSWR from "swr";
 import Image from "next/image";
+import ProfileList from "@/components/profile-list";
+import ProfileAnalytics from "@/components/profile-analytics";
 
 import { z } from "zod";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ListType } from "@/lib/types";
-import { useState } from "react";
-import ProfileList from "@/components/profile-list";
-import ProfileAnalytics from "@/components/profile-analytics";
 
 const dummyImages = Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).map(
 	() => "https://cdn.myanimelist.net/r/160x220/images/anime/1812/134736.webp?s=c3eb45807e97a48a790807fde98d2793"
@@ -29,7 +26,6 @@ export default function Profile() {
 		const url = new URL(window.location.href);
 		url.searchParams.set("view", option.view);
 
-		// console.log(router.query.user);
 		if (option.view === "list") {
 			url.searchParams.set("list", option.list);
 			url.searchParams.set("page", "1");
@@ -159,19 +155,7 @@ export default function Profile() {
 			)}
 			{/* fix this later */}
 			{viewQuery.data === "list" && <ProfileList username={router.query.user as string} />}
-			{viewQuery.data === "analytics" && <ProfileAnalytics />}
+			{viewQuery.data === "analytics" && <ProfileAnalytics username={router.query.user as string} />}
 		</>
 	);
 }
-
-/*
-	<header className="relative w-full h-[300px]  aspect-video ">
-				{/* if the user's banner field is empty then show default */
-// <Image
-// 	className="w-full h-full"
-// 	src="/naruto-banner.jpg"
-// 	alt="naruto banner"
-// 	fill
-// />
-// </header>
-// */
