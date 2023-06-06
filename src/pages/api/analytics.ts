@@ -112,13 +112,17 @@ function getAnalytics(data: List[], addYears: boolean): Analytics {
         }
 
         if (addYears && listRecord.year !== null) {
-            analytics.years = [];
+            if (analytics.years === undefined) {
+                analytics.years = [];
+            }
+
             if (!analytics.years.includes(listRecord.year)) {
+                console.log(listRecord.year)
                 analytics.years.push(listRecord.year);
             }
         }
     }
-
+    console.log(analytics.years)
     return analytics;
 }
 

@@ -3,22 +3,30 @@ import ChartView from "./chart-view";
 import DetailView from "./detail-view";
 
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Analytics } from "@/lib/types";
 import { properCase } from "@/lib/utils";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
 
 const fetcher = (url: string): Promise<Analytics> => fetch(url).then((res) => res.json());
 
 export default function ProfileAnalytics({ username }: { username: string }) {
 	const router = useRouter();
 	const [view, setView] = useState<"DETAIL" | "CHART">("CHART");
+	const [years, setYears] = useState<number[]>([]);
 	const [year, setYear] = useState<number | undefined>(undefined);
 
 	const key = `/api/analytics?username=${username}${year === undefined ? "" : `&year=${year}`}`;
 	const { data, isLoading, error } = useSWR(key, fetcher);
+
+	useEffect(() => {
+		if (data?.years !== undefined) {
+			setYears(data.years);
+		}
+	}, [data]);
 
 	return (
 		<div className="w-11/12 mx-auto">
@@ -35,13 +43,29 @@ export default function ProfileAnalytics({ username }: { username: string }) {
 					</Button>
 
 					{data !== undefined && (
-						<Select value={`${year === undefined ? "" : year}`} onValueChange={(value) => {}}>
+						<Select
+							value={`${year === undefined ? "" : year}`}
+							onValueChange={(value) => {
+								if (value === "") {
+									setYear(undefined);
+									return;
+								}
+
+								const year = z.number().int().safeParse(Number(value));
+
+								if (!year.success) {
+									return;
+								}
+
+								setYear(year.data);
+							}}
+						>
 							<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
 								<SelectValue placeholder="Year" />
 							</SelectTrigger>
 							<SelectContent className="text-center justify-center">
 								<SelectItem value="">All</SelectItem>
-								{data.years?.sort().map((year, idx) => {
+								{years?.sort().map((year, idx) => {
 									return (
 										<SelectItem key={idx} value={`${year}`}>
 											{year}
