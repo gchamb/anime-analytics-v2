@@ -236,12 +236,15 @@ export default function ProfileList({ username }: { username: string }) {
 										<div key={animeListItem.id} className="w-11/12 text-center space-y-1 lg:w-1/2">
 											<AnimeCover image={animeListItem.imageUrl} name="" href={`/animes/${animeListItem.malId}`} />
 											{router.query.list === "rate" && (
-												<Ratings
+												<div className="flex justify-center">
+													<Ratings
 													readOnly
 													value={
 														ratingSchema.safeParse(animeListItem.rate).success ? (animeListItem.rate as Rating) : 0
 													}
 												/>
+												</div>
+												
 											)}
 											{session.data?.user.username?.toLowerCase() === username.toLowerCase() && (
 												<DropdownMenu>
