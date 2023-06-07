@@ -224,7 +224,11 @@ export default function ProfileList({ username }: { username: string }) {
 					</div>
 				</div>
 				{/* List of Animes */}
-				{isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+				{isLoading && (
+					<div className="h-full flex justify-center items-center">
+						<Loader2 className="w-20 h-20 animate-spin text-aa-2 dark:text-aa-3" />
+					</div>
+				)}
 				{fetchError && <p>{String(fetchError)}</p>}
 				{data !== undefined && (
 					<>
@@ -238,13 +242,12 @@ export default function ProfileList({ username }: { username: string }) {
 											{router.query.list === "rate" && (
 												<div className="flex justify-center">
 													<Ratings
-													readOnly
-													value={
-														ratingSchema.safeParse(animeListItem.rate).success ? (animeListItem.rate as Rating) : 0
-													}
-												/>
+														readOnly
+														value={
+															ratingSchema.safeParse(animeListItem.rate).success ? (animeListItem.rate as Rating) : 0
+														}
+													/>
 												</div>
-												
 											)}
 											{session.data?.user.username?.toLowerCase() === username.toLowerCase() && (
 												<DropdownMenu>
