@@ -24,7 +24,7 @@ export default function Animes() {
 	});
 
 	const router = useRouter();
-	const fetchKey = `${jikan.getEndpoint("top")}?type=${getTypeQuery()}&filter=${
+	const fetchKey = `${jikan.getEndpoint("top")}?type=tv&filter=${
 		Sections[getTypeQuery()]
 	}&page=${pageQuery()}`;
 	const { data, error, isLoading } = useSwr(fetchKey, fetcher);
