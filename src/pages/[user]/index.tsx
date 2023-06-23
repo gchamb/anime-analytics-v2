@@ -2,21 +2,32 @@ import useSWR from "swr";
 import Image from "next/image";
 import ProfileList from "@/components/profile-list";
 import ProfileAnalytics from "@/components/profile-analytics";
+import AnimeCover from "@/components/anime-cover";
 
 import { z } from "zod";
 import { useRouter } from "next/router";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { ArrowRight } from "lucide-react";
-import { ListType } from "@/lib/types";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { ListType, ListRowSchema } from "@/lib/types";
+import { FullScreen } from "@/components/full-screen";
 
-const dummyImages = Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).map(
-	() => "https://cdn.myanimelist.net/r/160x220/images/anime/1812/134736.webp?s=c3eb45807e97a48a790807fde98d2793"
-);
+const fetcher = async (
+	url: string
+): Promise<{
+	watch: z.infer<typeof ListRowSchema>[];
+	plan: z.infer<typeof ListRowSchema>[];
+	rate: z.infer<typeof ListRowSchema>[];
+	bio: string | null;
+	image: string | undefined;
+}> => fetch(url).then((res) => res.json());
 
 export default function Profile() {
-	// const session = useSession();
 	const router = useRouter();
-	const { data, error, isLoading } = useSWR(`/api/user/profile`);
+	const { user } = router.query;
+
+	const { data, error, isLoading } = useSWR(
+		user !== undefined ? `/api/user/profile?username=${router.query.user}` : null,
+		fetcher
+	);
 	const viewQuery = z
 		.union([z.literal("list"), z.literal("analytics")])
 		.optional()
@@ -38,32 +49,46 @@ export default function Profile() {
 	};
 
 	if (!viewQuery.success) {
-		// TODO: better error message
-		return "Bad";
+		return (
+			<FullScreen>
+				<h1 className="text-2xl font-bold">Invalid View Query.</h1>
+			</FullScreen>
+		);
 	}
 
+	if (error !== undefined) {
+		return (
+			<FullScreen>
+				<h1 className="text-2xl font-bold">{error instanceof Error ? error.message : String(error)} </h1>
+			</FullScreen>
+		);
+	}
+
+	if (isLoading || data === undefined) {
+		return (
+			<FullScreen>
+				<Loader2 className="w-20 h-20 animate-spin text-aa-2 dark:text-aa-3" />
+			</FullScreen>
+		);
+	}
+
+	console.log(error);
 	return (
 		<>
 			{viewQuery.data === undefined && (
-				<div className="md:h-5/6 lg:h-full">
+				<div>
 					{/* validate to make sure it is valid */}
 					<h1 className="text-center text-5xl lg:hidden">{router.query.user}</h1>
 					<div className="flex flex-col gap-10 h-full md:flex-row ">
-						<div className="hidden lg:block w-[500px] h-[800px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
+						<div className="hidden lg:block w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
 							<div className="relative w-[200px] h-[200px] m-auto">
 								<Image className="w-full h-full rounded-full" src="/logo.png" alt="logo" fill />
 							</div>
 							<h1 className="text-center text-5xl">{router.query.user}</h1>
 
-							<p>
-								Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum dolores hic qui laboriosam corrupti
-								et? Dicta numquam, ab minima maiores veritatis magni delectus cum deserunt amet molestias dignissimos
-								eligendi nisi! Lorem ipsum dolor sit, amet consectetur adipisicing elit. Explicabo, voluptatem! Ipsa
-								cum, architecto laboriosam neque quibusdam asperiores quod tempore, facere ratione odio accusamus non
-								minima nesciunt, numquam dolor expedita illo?
-							</p>
+							<p>{data.bio ?? ""}</p>
 						</div>
-						<div className="w-full h-full grid grid-rows-4 p-2 gap-5 lg:gap-12">
+						<div className="w-full h-full grid auto-cols-fr md:grid-rows-3  p-2 gap-5 ">
 							<div className="m-auto w-11/12">
 								<div className="flex items-center">
 									<h1 className="text-xl">Watch List</h1>
@@ -76,15 +101,13 @@ export default function Profile() {
 									</button>
 								</div>
 
-								<div className="grid grid-cols-5 gap-2 md:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-									{dummyImages.map((image) => {
-										return (
-											<AspectRatio key={image} ratio={2 / 3}>
-												<Image src={image} alt={`image poster`} fill className="rounded-md object-cover" />
-											</AspectRatio>
-										);
-									})}
-								</div>
+								{data.watch.length !== 0 && (
+									<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+										{data.watch.map((watchAnime) => {
+											return <AnimeCover key={watchAnime.id} image={watchAnime.imageUrl} name="" dontShowName />;
+										})}
+									</div>
+								)}
 							</div>
 							<div className="m-auto w-11/12">
 								<div className="flex items-center">
@@ -97,15 +120,13 @@ export default function Profile() {
 										<ArrowRight />
 									</button>
 								</div>
-								<div className="grid grid-cols-5 gap-2 md:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-									{dummyImages.map((image) => {
-										return (
-											<AspectRatio key={image} ratio={2 / 3}>
-												<Image src={image} alt={`image poster`} fill className="rounded-md object-cover" />
-											</AspectRatio>
-										);
-									})}
-								</div>
+								{data.plan.length !== 0 && (
+									<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+										{data.plan.map((planAnime) => {
+											return <AnimeCover key={planAnime.id} image={planAnime.imageUrl} dontShowName name="" />;
+										})}
+									</div>
+								)}
 							</div>
 							<div className="m-auto w-11/12">
 								<div className="flex items-center">
@@ -118,36 +139,22 @@ export default function Profile() {
 										<ArrowRight />
 									</button>
 								</div>
-								<div className="grid grid-cols-5 gap-2 md:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-									{dummyImages.map((image) => {
-										return (
-											<AspectRatio key={image} ratio={2 / 3}>
-												<Image src={image} alt={`image poster`} fill className="rounded-md object-cover" />
-											</AspectRatio>
-										);
-									})}
-								</div>
+								{data.rate.length !== 0 && (
+									<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+										{data.rate.map((rateAnime) => {
+											return <AnimeCover key={rateAnime.id} image={rateAnime.imageUrl} dontShowName name="" />;
+										})}
+									</div>
+								)}
 							</div>
-							<div className="m-auto w-11/12">
-								<div className="flex items-center">
-									<h1 className="text-xl">Analytics</h1>
-									<button
-										className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-										onClick={() => viewChanger({ view: "analytics" })}
-									>
-										Show
-										<ArrowRight />
-									</button>
-								</div>
-								<div className="grid grid-cols-5 gap-2 md:grid-cols-10 border-2 p-2 rounded border-black cursor-pointer dark:border-aa-2">
-									{dummyImages.map((image) => {
-										return (
-											<AspectRatio key={image} ratio={2 / 3}>
-												<Image src={image} alt={`image poster`} fill className="rounded-md object-cover" />
-											</AspectRatio>
-										);
-									})}
-								</div>
+							<div className="mt-5 mx-auto w-11/12">
+								<button
+									className="ml-auto md:mr-0 flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+									onClick={() => viewChanger({ view: "analytics" })}
+								>
+									Analytics
+									<ArrowRight />
+								</button>
 							</div>
 						</div>
 					</div>
