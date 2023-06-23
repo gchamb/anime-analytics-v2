@@ -50,7 +50,7 @@ model List {
   rate        Float?
   month       String?
   year        Int?
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String 
 }
 
@@ -61,6 +61,7 @@ model User {
   emailVerified DateTime?
   username      String?   @unique
   image         String?
+  bio           String?
   lists         List[]
   accounts      Account[]
   sessions      Session[]
