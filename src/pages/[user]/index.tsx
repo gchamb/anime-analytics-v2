@@ -6,9 +6,14 @@ import AnimeCover from "@/components/anime-cover";
 
 import { z } from "zod";
 import { useRouter } from "next/router";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Edit2, Loader2 } from "lucide-react";
 import { ListType, ListRowSchema } from "@/lib/types";
 import { FullScreen } from "@/components/full-screen";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { Textarea } from "@/components/ui/text-area";
+import { Input } from "@/components/ui/input";
 
 const fetcher = async (
 	url: string
@@ -21,13 +26,18 @@ const fetcher = async (
 }> => fetch(url).then((res) => res.json());
 
 export default function Profile() {
-	const router = useRouter();
-	const { user } = router.query;
+	const [nowEditable, setNowEditable] = useState(false);
+	const [bio, setBio] = useState("");
+	const [username, setUsername] = useState("");
 
+	const router = useRouter();
+	const session = useSession();
+	const { user } = router.query;
 	const { data, error, isLoading } = useSWR(
 		user !== undefined ? `/api/user/profile?username=${router.query.user}` : null,
 		fetcher
 	);
+
 	const viewQuery = z
 		.union([z.literal("list"), z.literal("analytics")])
 		.optional()
@@ -47,6 +57,8 @@ export default function Profile() {
 
 		router.push(url);
 	};
+
+	const saveChanges = () => {};
 
 	if (!viewQuery.success) {
 		return (
@@ -72,21 +84,47 @@ export default function Profile() {
 		);
 	}
 
-	console.log(error);
 	return (
 		<>
 			{viewQuery.data === undefined && (
 				<div>
 					{/* validate to make sure it is valid */}
 					<h1 className="text-center text-5xl lg:hidden">{router.query.user}</h1>
-					<div className="flex flex-col gap-10 h-full md:flex-row ">
-						<div className="hidden lg:block w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
-							<div className="relative w-[200px] h-[200px] m-auto">
-								<Image className="w-full h-full rounded-full" src="/logo.png" alt="logo" fill />
-							</div>
-							<h1 className="text-center text-5xl">{router.query.user}</h1>
+					<div className="flex flex-col gap-10 h-full md:flex-row">
+						<div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
+							{session.status === "authenticated" &&
+								typeof user === "string" &&
+								session.data?.user.username?.toLowerCase() === user.toLowerCase() && (
+									<Button className="absolute right-1" variant="ghost" onClick={() => setNowEditable(true)}>
+										<Edit2 />
+									</Button>
+								)}
 
-							<p>{data.bio ?? ""}</p>
+							<div className="flex flex-col gap-2">
+								<div className="relative w-[200px] h-[200px] mx-auto">
+									<Image className="w-full h-full rounded-full" src={data.image ?? "/logo.png"} alt="logo" fill />
+								</div>
+
+								<h1 className="text-center text-5xl font-semibold">{user}</h1>
+							</div>
+
+							{!nowEditable ? (
+								<p className="my-auto">{data.bio ?? "No Bio."}</p>
+							) : (
+								<Textarea
+									placeholder="Tell us a little bit about yourself"
+									maxLength={150}
+									className="my-auto h-[120px] resize-none"
+									value={bio === "" ? data.bio ?? bio : bio}
+									onChange={(e) => setBio(e.currentTarget.value)}
+								/>
+							)}
+
+							{nowEditable && (
+								<Button variant="outline" className="mt-auto" onClick={saveChanges}>
+									Save Changes
+								</Button>
+							)}
 						</div>
 						<div className="w-full h-full grid auto-cols-fr md:grid-rows-3  p-2 gap-5 ">
 							<div className="m-auto w-11/12">
