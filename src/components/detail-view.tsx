@@ -24,7 +24,7 @@ function transformData(
 		const formattedData = Object.entries(dataChart).map(([title, data], idx) => {
 			return { title, data };
 		});
-		console.log(formattedData);
+	
 		returnData = returnData.concat(formattedData);
 	}
 

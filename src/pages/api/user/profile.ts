@@ -99,7 +99,7 @@ export default async function getProfileHandler(
       }
 
       //   save the bio and image uid
-      console.log(bio ?? usernameExist.bio);
+      
       await prisma.user.update({
         where: { username: username },
         data: {
@@ -111,7 +111,7 @@ export default async function getProfileHandler(
       return res.status(200).end();
     }
   } catch (err) {
-    console.log(err);
+
     if (req.method === "GET") res.json({ error: "Unable to fetch user." });
     return res.json({ error: "Unable to save changes." });
   }
