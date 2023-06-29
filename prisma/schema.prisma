@@ -38,7 +38,7 @@ model Session {
 }
 
 model List {
-  id          String @default(cuid())
+  id          String @id @default(cuid())
   malId       Int    
   animeName   String
   animeGenres Json   @db.Json
@@ -51,9 +51,7 @@ model List {
   month       String?
   year        Int?
   user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String 
-
-  @@id([id, malId])
+  userId      String
 }
 
 model User {
