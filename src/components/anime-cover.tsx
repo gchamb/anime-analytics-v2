@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { AspectRatio } from "./ui/aspect-ratio";
@@ -20,13 +19,23 @@ export default function AnimeCover({ image, name, showFull, animeView, href, don
 					{dontShowName === undefined && <h1 className="text-xl md:text-2xl">{name}</h1>}
 
 					<AspectRatio ratio={2 / 3}>
-						<Image src={image} alt={`${name} image poster`} fill className="rounded-md object-cover" />
+						<img
+							src={image}
+							alt={`${name} image poster`}
+							loading="lazy"
+							className="rounded-md object-cover h-full w-full"
+						/>
 					</AspectRatio>
 				</React.Fragment>
 			) : (
 				<React.Fragment>
 					<AspectRatio ratio={2 / 3}>
-						<Image src={image} alt={`${name} image poster`} fill className="rounded-md object-cover" />
+						<img
+							src={image}
+							alt={`${name} image poster`}
+							loading="lazy"
+							className="rounded-md object-cover h-full w-full"
+						/>
 					</AspectRatio>
 					{dontShowName === undefined && (
 						<>
