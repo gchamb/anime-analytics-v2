@@ -1,5 +1,5 @@
-import SignIn from "./sign-in-dialog";
-import UsernameDialog from "./required-username-dialog";
+import SignIn from "../sign-in-dialog";
+import UsernameDialog from "../required-username-dialog";
 import React from "react";
 
 import { LogOut, User } from "lucide-react";
@@ -11,7 +11,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuLabel,
 	DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "./dropdown-menu";
 import { useRouter } from "next/router";
 
 export default function Account() {

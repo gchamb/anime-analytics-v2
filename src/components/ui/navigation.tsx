@@ -1,4 +1,4 @@
-import Account from "@/components/account";
+import Account from "./account";
 import Link from "next/link";
 
 import { ArrowLeft } from "lucide-react";
