@@ -62,9 +62,10 @@ export default function ProfileList({ username }: { username: string }) {
 		}
 	}, [router.query.list, router.query.page, username]);
 
-
 	const { data, isLoading, error: fetchError, mutate, isValidating } = useSWR(key, fetcher);
 	const { trigger } = useSWRMutation("/api/list", fetcherMutate);
+
+	const serverError = z.object({ error: z.string() }).safeParse(data);
 
 	const mutateList = async (
 		id: string,
@@ -244,10 +245,14 @@ export default function ProfileList({ username }: { username: string }) {
 						<Loader2 className="w-20 h-20 animate-spin text-aa-2 dark:text-aa-3" />
 					</div>
 				)}
-				{fetchError && <p>{String(fetchError)}</p>}
-				{data !== undefined && (
+				{fetchError ||
+					(serverError.success && (
+						<div className="h-4/5 grid place-items-center">
+							<p className="text-center">{fetchError ? String(fetchError) : serverError.data.error}</p>
+						</div>
+					))}
+				{data !== undefined && fetchError === undefined && !isLoading && !serverError.success && (
 					<>
-						{console.log(data, isValidating)}
 						{data.list.length > 0 && (
 							<div className="w-11/12  m-auto grid grid-cols-3 gap-2 justify-items-center md:grid-cols-6">
 								{data.list.map((animeListItem, idx) => {
