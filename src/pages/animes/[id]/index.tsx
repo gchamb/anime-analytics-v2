@@ -35,30 +35,29 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 	const { trigger } = useSWRMutation("/api/list", listRequestFetcher);
 
 	const handleListRequest = async (list: ListType) => {
+		if (list === "delete") {
+			return;
+		}
+
+		// show dialog for rating
+		if (list === "rate") {
+			setOpenRateDialog(true);
+			return;
+		}
+
 		// formulate list request for data
-		if (list !== "delete") {
-			if (list === "rate") {
-				setOpenRateDialog(true);
-				return;
+		const animeListRequest = formulateAnimeListRequest(anime, list);
+		const response = await trigger({ method: "POST", listRequestData: animeListRequest });
+
+		if (response !== undefined) {
+			if (!response.ok) {
+				const err = (await response.json()) as { error: string };
+				setError(err.error);
+			} else {
+				setSuccess(`You successfully added ${animeListRequest.animeName} to ${animeListRequest.listRequestType} list`);
 			}
 
-			// for watching and planning send request immediately
-			// show dialog for rating
-			const animeListRequest = formulateAnimeListRequest(anime, list);
-			const response = await trigger({ method: "POST", listRequestData: animeListRequest });
-
-			if (response !== undefined) {
-				if (!response.ok) {
-					const err = (await response.json()) as { error: string };
-					setError(err.error);
-				} else {
-					setSuccess(
-						`You successfully added ${animeListRequest.animeName} to ${animeListRequest.listRequestType} list`
-					);
-				}
-
-				setOpenRateDialog(false);
-			}
+			setOpenRateDialog(false);
 		}
 	};
 
