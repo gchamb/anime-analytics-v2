@@ -1,6 +1,5 @@
 import useSWR from "swr";
-import useSWRMutation, { MutationFetcher } from "swr/mutation";
-import Image from "next/image";
+import useSWRMutation from "swr/mutation";
 import ProfileList from "@/components/profile-list";
 import ProfileAnalytics from "@/components/profile-analytics";
 import AnimeCover from "@/components/anime-cover";
