@@ -27,7 +27,7 @@ export default function ProfileAnalytics({ username }: { username: string }) {
 	}, [data]);
 
 	return (
-		<div className="w-11/12 mx-auto">
+		<div className="w-11/12 mx-auto h-4/5">
 			<div className="grid items-center">
 				<h1 className="hidden text-lg text-center md:block">{properCase(username)} Analytics</h1>
 				<div className=" justify-self-center grid grid-cols-2 gap-2 pb-1 md:justify-self-end lg:grid-rows-2 lg:grid-cols-none">
@@ -75,9 +75,11 @@ export default function ProfileAnalytics({ username }: { username: string }) {
 					)}
 				</div>
 			</div>
-			<div>
-				{isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-				{error && <p>{String(error)}</p>}
+			<div className="h-full grid ">
+				{isLoading && (
+					<Loader2 className="w-20 h-20 justify-self-center self-center animate-spin text-aa-2 dark:text-aa-3" />
+				)}
+				{error && <p className="self-center justify-self-center">{String(error)}</p>}
 				{data !== undefined && <>{view === "CHART" ? <ChartView data={data} /> : <DetailView data={data} />}</>}
 			</div>
 		</div>
