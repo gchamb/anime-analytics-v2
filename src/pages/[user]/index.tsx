@@ -189,7 +189,7 @@ export default function Profile() {
 										variant="ghost"
 										onClick={() => {
 											if (nowEditable) {
-												setBio("");
+												setBio(data.bio ?? "");
 												setImage(undefined);
 												setValidationError({
 													profilePicError: "",
