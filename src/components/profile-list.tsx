@@ -17,6 +17,7 @@ import Ratings, { Rating, ratingSchema } from "./ui/ratings";
 import { useSession } from "next-auth/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { DialogHeader, Dialog, DialogContent, DialogTitle } from "./ui/dialog";
+import { FullScreen } from "./full-screen";
 
 const fetcher = (url: string): Promise<{ list: Omit<List, "userId">[]; pages: number }> =>
 	fetch(url).then((res) => res.json());
@@ -61,6 +62,7 @@ export default function ProfileList({ username }: { username: string }) {
 		}
 	}, [router.query.list, router.query.page, username]);
 
+
 	const { data, isLoading, error: fetchError, mutate, isValidating } = useSWR(key, fetcher);
 	const { trigger } = useSWRMutation("/api/list", fetcherMutate);
 
@@ -71,9 +73,23 @@ export default function ProfileList({ username }: { username: string }) {
 		rate?: Rating,
 		ratedAt?: Date
 	) => {
-		// you should be able to delete request and put request
+		// function is for only mutating the current list of the authorized user
 		let res: Response | undefined;
-		const listRequestType = type === "watch" || type === "plan" ? type : (router.query.list as "watch" | "plan");
+		let listRequestType: "watch" | "plan" = "watch";
+
+		// listRequestType can only be watch, plan, or rate due to that being the only tracked list
+		if (type === "watch" || type === "plan") {
+			// switching anime from watch to plan or from plan to watch
+			listRequestType = type;
+
+			res = await trigger({ listData: { id, listRequestType }, method: "PUT" });
+		} else {
+			// can where the current anime is at to change to another such as rate
+			if (typeof router.query.list === "string" && (router.query.list === "watch" || router.query.list === "plan")) {
+				listRequestType = router.query.list;
+			}
+		}
+
 		// means they want to delete the current list row
 		if (type === "delete") {
 			res = await trigger({ listData: { listRequestType, id }, method: "DELETE" });
@@ -98,17 +114,12 @@ export default function ProfileList({ username }: { username: string }) {
 				method: "PUT",
 			});
 		}
-		// make watch and plan put request
-		if (type === "watch" || type == "plan") {
-			res = await trigger({ listData: { id, listRequestType }, method: "PUT" });
-		}
 
 		if (res !== undefined) {
 			if (!res.ok) {
 				const err = (await res.json()) as { error: string };
 				setError(err.error);
 			} else {
-				console.log(router.query.list, type);
 				if (type === "delete") {
 					setSuccess(`You successfully deleted ${animeName} from ${router.query.list} list`);
 				} else if (router.query.list !== "rate" && type === "rate") {
@@ -144,7 +155,11 @@ export default function ProfileList({ username }: { username: string }) {
 	};
 
 	if (key === null) {
-		return <h1>Bad</h1>;
+		return (
+			<FullScreen>
+				<p>Error has occured. Try to refresh.</p>
+			</FullScreen>
+		);
 	}
 
 	return (
