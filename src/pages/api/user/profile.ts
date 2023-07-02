@@ -11,10 +11,11 @@ export default async function getProfileHandler(
   if (req.method !== "GET" && req.method !== "PATCH") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
-  const { username } = req.query;
+  let { username } = req.query;
   if (typeof username !== "string") {
     return res.status(405).json({ error: "Invalid username parameter." });
   }
+  username = username.split("-").join(" ");
 
   try {
     const usernameExist = await prisma.user.findUnique({
@@ -99,7 +100,7 @@ export default async function getProfileHandler(
       }
 
       //   save the bio and image uid
-      
+
       await prisma.user.update({
         where: { username: username },
         data: {

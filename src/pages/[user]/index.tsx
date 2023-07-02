@@ -179,7 +179,7 @@ export default function Profile() {
 			{viewQuery.data === undefined && (
 				<div>
 					{/* validate to make sure it is valid */}
-					<h1 className="text-center text-5xl lg:hidden">{router.query.user}</h1>
+					<h1 className="text-center text-5xl lg:hidden">{typeof user === "string" && user.split("-").join(" ")}</h1>
 					<div className="flex flex-col gap-10 h-full md:flex-row">
 						<div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
 							{session.status === "authenticated" &&
@@ -274,7 +274,9 @@ export default function Profile() {
 										setImage(file);
 									}}
 								/>
-								<h1 className="text-center text-5xl font-semibold">{user}</h1>
+								<h1 className="text-center text-5xl font-semibold">
+									{typeof user === "string" && user.split("-").join(" ")}
+								</h1>
 							</div>
 
 							{!nowEditable ? (

@@ -14,12 +14,13 @@ export default async function usernameHandler(
     }
 
     // validate username
-    const { username } = req.body;
+    let { username } = req.body;
 
     const isValid = isValidUsername(username);
     if (!isValid.valid) {
         return res.status(400).json({ error: isValid.reason })
     }
+    username = username.split("-").join(" ");
 
     try {
         // make sure the session is valid

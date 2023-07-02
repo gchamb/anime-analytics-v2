@@ -117,12 +117,12 @@ function getAnalytics(data: List[], addYears: boolean): Analytics {
             }
 
             if (!analytics.years.includes(listRecord.year)) {
-                
+
                 analytics.years.push(listRecord.year);
             }
         }
     }
-    
+
     return analytics;
 }
 
@@ -131,7 +131,7 @@ export default async function analyticsHandler(
     res: NextApiResponse
 ) {
 
-    const { year, username } = req.query;
+    let { year, username } = req.query;
 
     // should show the analytics for the year requested
     // if year is undefined then show all
@@ -139,6 +139,7 @@ export default async function analyticsHandler(
     if (username === undefined || typeof username !== "string") {
         return res.status(400).json({ error: "Invalid Request." });
     }
+    username = username.split("-").join(" ");
 
     const requestedUser = await prisma.user.findUnique({
         where: {

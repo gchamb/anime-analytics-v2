@@ -15,7 +15,7 @@ export default async function listHandler(
         const session = await getServerSession(req, res, authOptions);
 
         let { listData } = req.body;
-        const { page: queryPage, list, username } = req.query;
+        let { page: queryPage, list, username } = req.query;
 
         if ((req.method === "POST" || req.method === "DELETE" || req.method === "PUT") && session === null) {
             // The user is not authenticated, return an error response
@@ -27,6 +27,8 @@ export default async function listHandler(
                 if (typeof username !== "string" || list === undefined || !isListType(list) || list === "delete") {
                     return res.status(400).json({ error: "Invalid Request Body" });
                 }
+                username = username.split("-").join(" ");
+                
 
                 const user = await prisma.user.findUnique({ where: { username } })
 

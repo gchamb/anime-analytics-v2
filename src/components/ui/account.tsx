@@ -47,7 +47,7 @@ export default function Account() {
 									return;
 								}
 
-								const urlUsername = data.user.username.split(" ").join("-").toLowerCase();
+								const urlUsername = data.user.username.split(" ").join("-");
 
 								router.push(`/${urlUsername}`);
 							}}
