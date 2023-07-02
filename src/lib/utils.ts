@@ -159,6 +159,15 @@ export const getTranformedDate = (date: Date): { year: number; month: Months } =
 }
 
 export function properCase(name: string) {
-  const firstChar = name.charAt(0).toUpperCase();
-  return firstChar + name.substring(1, name.length).toLowerCase();
+  if (name.includes("-")) {
+    return name.split("-").map((name) => {
+      const firstChar = name.charAt(0).toUpperCase();
+      return firstChar + name.substring(1, name.length).toLowerCase();
+    }).join(" ")
+  }
+
+  return name.split(" ").map((name) => {
+    const firstChar = name.charAt(0).toUpperCase();
+    return firstChar + name.substring(1, name.length).toLowerCase();
+  }).join(" ")
 }
