@@ -6,14 +6,6 @@ import { AnimeListRequestSchema, BasicListRequestSchema, PutListRequestSchema, i
 import { Session } from 'next-auth/core/types';
 import { getTranformedDate } from '@/lib/utils';
 
-type SessionType = Awaited<ReturnType<typeof getServerSession<AuthOptions, Session>>>;
-
-const handleAuthenticatedUsers = (res: NextApiResponse, session: SessionType) => {
-    if (session === null) {
-        // The user is not authenticated, return an error response
-        return res.status(401).json({ error: "Unauthorized" });
-    }
-}
 
 export default async function listHandler(
     req: NextApiRequest,
@@ -25,6 +17,11 @@ export default async function listHandler(
 
         let { listData } = req.body;
         const { page: queryPage, list, username } = req.query;
+
+        if ((req.method === "POST" || req.method === "DELETE" || req.method === "PUT") && session === null) {
+            // The user is not authenticated, return an error response
+            return res.status(401).json({ error: "Unauthorized" });
+        }
 
         switch (req.method) {
             case "GET":
@@ -54,7 +51,6 @@ export default async function listHandler(
 
                 return res.status(200).json({ list: specificList, pages: Math.ceil(listCount / LIST_MAX) });
             case "POST":
-                handleAuthenticatedUsers(res, session);
 
                 const parsedPost = AnimeListRequestSchema.safeParse(listData);
                 if (!parsedPost.success) {
@@ -116,8 +112,6 @@ export default async function listHandler(
 
                 return res.status(200).end()
             case "PUT":
-                handleAuthenticatedUsers(res, session);
-
                 const parsePut = PutListRequestSchema.safeParse(listData);
                 if (!parsePut.success) {
                     return res.status(400).json({ error: parsePut.error.message });
@@ -165,8 +159,6 @@ export default async function listHandler(
 
                 return res.status(200).end();
             case "DELETE":
-                handleAuthenticatedUsers(res, session);
-
                 const parsedDeleteData = BasicListRequestSchema.safeParse(listData);
 
                 if (!parsedDeleteData.success) {
