@@ -1,13 +1,32 @@
 import { Star } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { z } from "zod";
 
 type RatingsProps = {
 	readOnly?: true;
-	value?: number;
+	value?: Rating;
+	onRatingChanged?: (rating: Rating) => void;
 };
 
-export default function Ratings({ readOnly, value }: RatingsProps) {
-	const [rating, setRating] = useState(value ?? 0);
+export const ratingSchema = z.union([
+	z.literal(0),
+	z.literal(1),
+	z.literal(2),
+	z.literal(3),
+	z.literal(4),
+	z.literal(5),
+]);
+export type Rating = z.infer<typeof ratingSchema>;
+
+export default function Ratings({ readOnly, value, onRatingChanged }: RatingsProps) {
+	const [rating, setRating] = useState<Rating>(value ?? 0);
+
+	useEffect(() => {
+		if (!readOnly) {
+			onRatingChanged?.(rating);
+		}
+	}, [onRatingChanged, rating, readOnly]);
+
 	return (
 		<div className="flex gap-x-1">
 			{Array.from([1, 2, 3, 4, 5]).map((num) => {
@@ -22,7 +41,13 @@ export default function Ratings({ readOnly, value }: RatingsProps) {
 							}
 
 							const { id } = e.currentTarget;
-							setRating(Number(id));
+
+							const parsedId = ratingSchema.safeParse(Number(id));
+							if (!parsedId.success) {
+								return;
+							}
+
+							setRating(parsedId.data);
 						}}
 						onMouseLeave={(e) => {
 							if (readOnly) {

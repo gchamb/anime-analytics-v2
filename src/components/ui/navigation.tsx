@@ -1,4 +1,4 @@
-import Account from "../Account";
+import Account from "./account";
 import Link from "next/link";
 
 import { ArrowLeft } from "lucide-react";
@@ -31,11 +31,7 @@ export default function Navigation() {
 
 	return (
 		<nav className="flex w-11/12 m-auto items-center p-2">
-			<div>
-				{router.pathname !== "/" && (
-					<BackButton />
-				)}
-			</div>
+			<div>{router.pathname !== "/" && <BackButton />}</div>
 			<div className="ml-auto flex items-center gap-x-8">
 				{router.pathname !== "/browse" && (
 					<Link href="/browse" className="font-semibold cursor-pointer hover:text-aa-4 dark:hover:text-aa-3">
