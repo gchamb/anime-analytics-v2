@@ -184,7 +184,7 @@ export default function Profile() {
 						<div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
 							{session.status === "authenticated" &&
 								typeof user === "string" &&
-								session.data?.user.username?.toLowerCase() === user.toLowerCase() && (
+								session.data?.user.username?.toLowerCase() === user.split("-").join(" ").toLowerCase() && (
 									<Button
 										className="absolute right-1"
 										variant="ghost"
