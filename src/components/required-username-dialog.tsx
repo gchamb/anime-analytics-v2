@@ -1,6 +1,6 @@
 import useSWRMutation from "swr/mutation";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { isValidUsername } from "@/lib/types/validators";

@@ -1,9 +1,8 @@
 import prisma from '@/server/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { AuthOptions, getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import { authOptions } from './auth/[...nextauth]';
 import { AnimeListRequestSchema, BasicListRequestSchema, PutListRequestSchema, isListType } from '@/lib/types';
-import { Session } from 'next-auth/core/types';
 import { getTranformedDate } from '@/lib/utils';
 
 
