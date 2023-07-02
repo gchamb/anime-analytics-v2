@@ -269,7 +269,7 @@ export default function ProfileList({ username }: { username: string }) {
 													/>
 												</div>
 											)}
-											{session.data?.user.username?.toLowerCase() === username.toLowerCase() && (
+											{session.data?.user.username?.toLowerCase() === username.split("-").join(" ").toLowerCase() && (
 												<DropdownMenu>
 													<DropdownMenuTrigger asChild>
 														<Button size="sm" variant="ghost" className="self-end">
