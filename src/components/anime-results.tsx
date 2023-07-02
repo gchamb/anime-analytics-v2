@@ -1,5 +1,4 @@
 import AnimeCover from "./anime-cover";
-import Link from "next/link";
 
 import { JikanAnime } from "@/lib/jikan/types";
 

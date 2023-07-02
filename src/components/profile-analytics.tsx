@@ -2,7 +2,6 @@ import useSWR from "swr";
 import ChartView from "./chart-view";
 import DetailView from "./detail-view";
 
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Analytics } from "@/lib/types";
@@ -14,7 +13,6 @@ import { z } from "zod";
 const fetcher = (url: string): Promise<Analytics> => fetch(url).then((res) => res.json());
 
 export default function ProfileAnalytics({ username }: { username: string }) {
-	const router = useRouter();
 	const [view, setView] = useState<"DETAIL" | "CHART">("CHART");
 	const [years, setYears] = useState<number[]>([]);
 	const [year, setYear] = useState<number | undefined>(undefined);

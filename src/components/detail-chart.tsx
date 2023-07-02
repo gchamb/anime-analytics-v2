@@ -6,7 +6,6 @@ type DetailChartProps = {
 };
 
 export default function DetailChart({ title, data }: DetailChartProps) {
-	console.log(title);
 	return (
 		<>
 			{data.length > 0 && (
