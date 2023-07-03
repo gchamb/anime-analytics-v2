@@ -4,6 +4,7 @@ import ListButton from "@/components/ui/list-button";
 import Ratings, { Rating, ratingSchema } from "@/components/ui/ratings";
 import useSWRMutation from "swr/mutation";
 import RateDialog from "@/components/rate-dialog";
+import Head from "next/head";
 
 import { Jikan } from "@/lib/jikan";
 import { JikanAnime } from "@/lib/jikan/types";
@@ -74,6 +75,9 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 
 	return (
 		<>
+			<Head>
+				<title>{anime.title}</title>
+			</Head>
 			{openRateDialog && (
 				<RateDialog
 					open={openRateDialog}

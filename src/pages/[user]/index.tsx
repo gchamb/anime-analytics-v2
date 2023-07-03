@@ -3,8 +3,9 @@ import useSWRMutation from "swr/mutation";
 import ProfileList from "@/components/profile-list";
 import ProfileAnalytics from "@/components/profile-analytics";
 import AnimeCover from "@/components/anime-cover";
-import { uploadFile } from "@uploadcare/upload-client";
+import Head from "next/head";
 
+import { uploadFile } from "@uploadcare/upload-client";
 import { z } from "zod";
 import { useRouter } from "next/router";
 import { ArrowRight, Edit2, Loader2 } from "lucide-react";
@@ -14,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Textarea } from "@/components/ui/text-area";
+import { properCase } from "@/lib/utils";
 
 const fetcher = async (
 	url: string
@@ -176,234 +178,246 @@ export default function Profile() {
 	return (
 		<>
 			{viewQuery.data === undefined && (
-				<div>
-					{/* validate to make sure it is valid */}
-					<h1 className="text-center text-5xl lg:hidden">{typeof user === "string" && user.split("-").join(" ")}</h1>
-					<div className="flex flex-col gap-10 h-full md:flex-row">
-						<div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
-							{session.status === "authenticated" &&
-								typeof user === "string" &&
-								session.data?.user.username?.toLowerCase() === user.split("-").join(" ").toLowerCase() && (
-									<Button
-										className="absolute right-1"
-										variant="ghost"
-										onClick={() => {
-											if (nowEditable) {
-												setBio(data.bio ?? "");
-												setImage(undefined);
-												setValidationError({
-													profilePicError: "",
-													bioError: "",
-													generalError: "",
-												});
-												setNowEditable(false);
-												return;
-											}
-
-											setNowEditable(true);
-										}}
-										disabled={isMutating}
-									>
-										<Edit2 />
-									</Button>
-								)}
-
-							<div className="flex flex-col gap-2">
-								<div className="relative w-[150px] h-[150px] mx-auto">
-									<img className="w-full h-full rounded-full" src={getProfilePic()} alt="profile pic" />
-								</div>
-								{nowEditable && !isMutating && (
-									<Button
-										className="w-1/2 mx-auto"
-										variant="outline"
-										onClick={() => {
-											if (imageUploadRef.current === null) {
-												return;
-											}
-
-											imageUploadRef.current.click();
-										}}
-									>
-										Upload
-									</Button>
-								)}
-								<input
-									className="hidden"
-									ref={(ref) => {
-										imageUploadRef.current = ref;
-									}}
-									type="file"
-									accept="image/*"
-									onChange={(e) => {
-										const { files } = e.target;
-
-										if (files === null || files.length === 0) {
-											return;
-										}
-
-										const file = files[0];
-
-										if (file.size > 5_000_000) {
-											setValidationError((prev) => {
-												return {
-													...prev,
-													profilePicError: "Image is bigger than 5MB",
-												};
-											});
-										}
-
-										const mime = file.type.split("/")[0].trim();
-										if (mime !== "image") {
-											setValidationError((prev) => {
-												return {
-													...prev,
-													profilePicError: "This file isn't an image",
-												};
-											});
-										}
-
-										if (file.size <= 5_000_000 && mime === "image") {
-											if (validationError.profilePicError !== "") {
-												setValidationError((prev) => {
-													return { ...prev, profilePicError: "" };
-												});
-											}
-										}
-
-										setImage(file);
-									}}
-								/>
-								<h1 className="text-center text-5xl font-semibold">
-									{typeof user === "string" && user.split("-").join(" ")}
-								</h1>
-							</div>
-
-							{!nowEditable ? (
-								<p className="my-auto text-center">{data.bio ?? "No Bio."}</p>
-							) : (
-								<>
-									{isMutating ? (
-										<Loader2 className="w-20 h-20 m-auto animate-spin text-aa-2 dark:text-aa-3" />
-									) : (
-										<Textarea
-											placeholder="Tell us a little bit about yourself"
-											maxLength={150}
-											className="my-auto text-center h-[120px] resize-none border-aa-dark-1 dark:border-aa-2"
-											value={bio === undefined ? data.bio ?? "" : bio}
-											onChange={(e) => {
-												const text = e.currentTarget.value;
-
-												setBio(text);
-
-												if (text.length > 150) {
-													setValidationError((prev) => {
-														return {
-															...prev,
-															bioError: "Bio is greater than 150 characters.",
-														};
+				<>
+					<Head>
+						<title>
+							{`${properCase(typeof router.query.user === "string" ? router.query.user.split("-").join(" ") : "")}'s`}
+							Profile
+						</title>
+					</Head>
+					<div>
+						{/* validate to make sure it is valid */}
+						<h1 className="text-center text-5xl lg:hidden">{typeof user === "string" && user.split("-").join(" ")}</h1>
+						<div className="flex flex-col gap-10 h-full md:flex-row">
+							<div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
+								{session.status === "authenticated" &&
+									typeof user === "string" &&
+									session.data?.user.username?.toLowerCase() === user.split("-").join(" ").toLowerCase() && (
+										<Button
+											className="absolute right-1"
+											variant="ghost"
+											onClick={() => {
+												if (nowEditable) {
+													setBio(data.bio ?? "");
+													setImage(undefined);
+													setValidationError({
+														profilePicError: "",
+														bioError: "",
+														generalError: "",
 													});
-												} else {
-													if (validationError.bioError !== "") {
+													setNowEditable(false);
+													return;
+												}
+
+												setNowEditable(true);
+											}}
+											disabled={isMutating}
+										>
+											<Edit2 />
+										</Button>
+									)}
+
+								<div className="flex flex-col gap-2">
+									<div className="relative w-[150px] h-[150px] mx-auto">
+										<img className="w-full h-full rounded-full" src={getProfilePic()} alt="profile pic" />
+									</div>
+									{nowEditable && !isMutating && (
+										<Button
+											className="w-1/2 mx-auto"
+											variant="outline"
+											onClick={() => {
+												if (imageUploadRef.current === null) {
+													return;
+												}
+
+												imageUploadRef.current.click();
+											}}
+										>
+											Upload
+										</Button>
+									)}
+									<input
+										className="hidden"
+										ref={(ref) => {
+											imageUploadRef.current = ref;
+										}}
+										type="file"
+										accept="image/*"
+										onChange={(e) => {
+											const { files } = e.target;
+
+											if (files === null || files.length === 0) {
+												return;
+											}
+
+											const file = files[0];
+
+											if (file.size > 5_000_000) {
+												setValidationError((prev) => {
+													return {
+														...prev,
+														profilePicError: "Image is bigger than 5MB",
+													};
+												});
+											}
+
+											const mime = file.type.split("/")[0].trim();
+											if (mime !== "image") {
+												setValidationError((prev) => {
+													return {
+														...prev,
+														profilePicError: "This file isn't an image",
+													};
+												});
+											}
+
+											if (file.size <= 5_000_000 && mime === "image") {
+												if (validationError.profilePicError !== "") {
+													setValidationError((prev) => {
+														return { ...prev, profilePicError: "" };
+													});
+												}
+											}
+
+											setImage(file);
+										}}
+									/>
+									<h1 className="text-center text-5xl font-semibold">
+										{typeof user === "string" && user.split("-").join(" ")}
+									</h1>
+								</div>
+
+								{!nowEditable ? (
+									<p className="my-auto text-center">{data.bio ?? "No Bio."}</p>
+								) : (
+									<>
+										{isMutating ? (
+											<Loader2 className="w-20 h-20 m-auto animate-spin text-aa-2 dark:text-aa-3" />
+										) : (
+											<Textarea
+												placeholder="Tell us a little bit about yourself"
+												maxLength={150}
+												className="my-auto text-center h-[120px] resize-none border-aa-dark-1 dark:border-aa-2"
+												value={bio === undefined ? data.bio ?? "" : bio}
+												onChange={(e) => {
+													const text = e.currentTarget.value;
+
+													setBio(text);
+
+													if (text.length > 150) {
 														setValidationError((prev) => {
 															return {
 																...prev,
-																bioError: "",
+																bioError: "Bio is greater than 150 characters.",
 															};
 														});
+													} else {
+														if (validationError.bioError !== "") {
+															setValidationError((prev) => {
+																return {
+																	...prev,
+																	bioError: "",
+																};
+															});
+														}
 													}
-												}
-											}}
-										/>
-									)}
-								</>
-							)}
-							{showError() !== "" && <p className="text-sm text-red-500">{showError()}</p>}
-							{nowEditable && (
-								<Button
-									variant="outline"
-									className="mt-auto"
-									onClick={saveChanges}
-									disabled={!canSaveChanges || isMutating}
-								>
-									Save Changes
-								</Button>
-							)}
-						</div>
-						<div className="w-full h-full grid auto-cols-fr md:grid-rows-3  p-2 gap-5 ">
-							<div className="m-auto w-11/12">
-								<div className="flex items-center">
-									<h1 className="text-xl">Watch List</h1>
-									<button
-										className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-										onClick={() => viewChanger({ view: "list", list: "watch" })}
+												}}
+											/>
+										)}
+									</>
+								)}
+								{showError() !== "" && <p className="text-sm text-red-500">{showError()}</p>}
+								{nowEditable && (
+									<Button
+										variant="outline"
+										className="mt-auto"
+										onClick={saveChanges}
+										disabled={!canSaveChanges || isMutating}
 									>
-										Show
-										<ArrowRight />
-									</button>
-								</div>
+										Save Changes
+									</Button>
+								)}
+							</div>
+							<div className="w-full h-full grid auto-cols-fr md:grid-rows-3  p-2 gap-5 ">
+								<div className="m-auto w-11/12">
+									<div className="flex items-center">
+										<h1 className="text-xl">Watch List</h1>
+										<button
+											className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+											onClick={() => viewChanger({ view: "list", list: "watch" })}
+										>
+											Show
+											<ArrowRight />
+										</button>
+									</div>
 
-								{data.watch.length !== 0 && (
-									<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-										{data.watch.map((watchAnime) => {
-											return <AnimeCover key={watchAnime.id} image={watchAnime.imageUrl} name="" dontShowName />;
-										})}
+									{data.watch.length !== 0 && (
+										<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+											{data.watch.map((watchAnime) => {
+												return <AnimeCover key={watchAnime.id} image={watchAnime.imageUrl} name="" dontShowName />;
+											})}
+										</div>
+									)}
+								</div>
+								<div className="m-auto w-11/12">
+									<div className="flex items-center">
+										<h1 className="text-xl">Plan List</h1>
+										<button
+											className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+											onClick={() => viewChanger({ view: "list", list: "plan" })}
+										>
+											Show
+											<ArrowRight />
+										</button>
 									</div>
-								)}
-							</div>
-							<div className="m-auto w-11/12">
-								<div className="flex items-center">
-									<h1 className="text-xl">Plan List</h1>
+									{data.plan.length !== 0 && (
+										<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+											{data.plan.map((planAnime) => {
+												return <AnimeCover key={planAnime.id} image={planAnime.imageUrl} dontShowName name="" />;
+											})}
+										</div>
+									)}
+								</div>
+								<div className="m-auto w-11/12">
+									<div className="flex items-center">
+										<h1 className="text-xl">Rate List</h1>
+										<button
+											className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+											onClick={() => viewChanger({ view: "list", list: "rate" })}
+										>
+											Show
+											<ArrowRight />
+										</button>
+									</div>
+									{data.rate.length !== 0 && (
+										<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+											{data.rate.map((rateAnime) => {
+												return <AnimeCover key={rateAnime.id} image={rateAnime.imageUrl} dontShowName name="" />;
+											})}
+										</div>
+									)}
+								</div>
+								<div className="mt-5 mx-auto w-11/12">
 									<button
-										className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-										onClick={() => viewChanger({ view: "list", list: "plan" })}
+										className="ml-auto md:mr-0 flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+										onClick={() => viewChanger({ view: "analytics" })}
 									>
-										Show
+										Analytics
 										<ArrowRight />
 									</button>
 								</div>
-								{data.plan.length !== 0 && (
-									<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-										{data.plan.map((planAnime) => {
-											return <AnimeCover key={planAnime.id} image={planAnime.imageUrl} dontShowName name="" />;
-										})}
-									</div>
-								)}
-							</div>
-							<div className="m-auto w-11/12">
-								<div className="flex items-center">
-									<h1 className="text-xl">Rate List</h1>
-									<button
-										className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-										onClick={() => viewChanger({ view: "list", list: "rate" })}
-									>
-										Show
-										<ArrowRight />
-									</button>
-								</div>
-								{data.rate.length !== 0 && (
-									<div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-										{data.rate.map((rateAnime) => {
-											return <AnimeCover key={rateAnime.id} image={rateAnime.imageUrl} dontShowName name="" />;
-										})}
-									</div>
-								)}
-							</div>
-							<div className="mt-5 mx-auto w-11/12">
-								<button
-									className="ml-auto md:mr-0 flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-									onClick={() => viewChanger({ view: "analytics" })}
-								>
-									Analytics
-									<ArrowRight />
-								</button>
 							</div>
 						</div>
 					</div>
-				</div>
+				</>
 			)}
-			{/* fix this later */}
-			{viewQuery.data === "list" && <ProfileList username={router.query.user as string} />}
-			{viewQuery.data === "analytics" && <ProfileAnalytics username={router.query.user as string} />}
+
+			{viewQuery.data === "list" && (
+				<ProfileList username={typeof router.query.user === "string" ? router.query.user : ""} />
+			)}
+			{viewQuery.data === "analytics" && (
+				<ProfileAnalytics username={typeof router.query.user === "string" ? router.query.user : ""} />
+			)}
 		</>
 	);
 }

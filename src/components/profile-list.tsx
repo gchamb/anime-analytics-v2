@@ -4,6 +4,7 @@ import useSWRMutation from "swr/mutation";
 import React from "react";
 import Pagination from "./pagination";
 import RateDialog from "./rate-dialog";
+import Head from "next/head";
 
 import { useRouter } from "next/router";
 import { z } from "zod";
@@ -18,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { DialogHeader, Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import { FullScreen } from "./full-screen";
+
 
 const fetcher = (url: string): Promise<{ list: Omit<List, "userId">[]; pages: number }> =>
 	fetch(url).then((res) => res.json());
@@ -62,7 +64,7 @@ export default function ProfileList({ username }: { username: string }) {
 		}
 	}, [router.query.list, router.query.page, username]);
 
-	const { data, isLoading, error: fetchError, mutate, isValidating } = useSWR(key, fetcher);
+	const { data, isLoading, error: fetchError, mutate } = useSWR(key, fetcher);
 	const { trigger } = useSWRMutation("/api/list", fetcherMutate);
 
 	const serverError = z.object({ error: z.string() }).safeParse(data);
@@ -165,6 +167,9 @@ export default function ProfileList({ username }: { username: string }) {
 
 	return (
 		<>
+			<Head>
+				<title>{`${properCase(username)}'s ${properCase(router.query.list as string)} List`}</title>
+			</Head>
 			<RateDialog
 				open={rateDialog.status}
 				animeName={rateDialog.animeName}

@@ -2,10 +2,11 @@ import AnimeResults from "@/components/anime-results";
 import React, { useMemo, useState } from "react";
 import Pagination from "@/components/pagination";
 import useSwr from "swr";
+import Head from "next/head";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sections, isSection } from "@/lib/types";
-import { getGenres, getTypeQuery, pageQuery } from "@/lib/utils";
+import { getGenres, getTypeQuery, pageQuery, properCase } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { FullScreen } from "@/components/full-screen";
@@ -24,9 +25,7 @@ export default function Animes() {
 	});
 
 	const router = useRouter();
-	const fetchKey = `${jikan.getEndpoint("top")}?type=tv&filter=${
-		Sections[getTypeQuery()]
-	}&page=${pageQuery()}`;
+	const fetchKey = `${jikan.getEndpoint("top")}?type=tv&filter=${Sections[getTypeQuery()]}&page=${pageQuery()}`;
 	const { data, error, isLoading } = useSwr(fetchKey, fetcher);
 
 	const filteredData = useMemo(() => {
@@ -59,7 +58,7 @@ export default function Animes() {
 	}, [data?.data, filters]);
 
 	const onFilterChanged = (
-		filter: { type: "genre"; value: string | undefined } | { type: "episodes"; value: typeof filters["episodes"] }
+		filter: { type: "genre"; value: string | undefined } | { type: "episodes"; value: (typeof filters)["episodes"] }
 	) => {
 		if (filter.type === "episodes") {
 			setFilters((prev) => {
@@ -114,103 +113,108 @@ export default function Animes() {
 	}
 
 	return (
-		<div className="grid w-11/12 max-w-[1280px] md:w-2/3 m-auto">
-			<div className="grid grid-cols-3 justify-center gap-x-3 p-5">
-				<Select
-					value={getTypeQuery()}
-					onValueChange={(value) => {
-						if (!isSection(value)) {
-							return;
-						}
-
-						router.push(`/animes?type=${value}`);
-					}}
-				>
-					<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
-						<SelectValue placeholder="Type" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="airing">Airing</SelectItem>
-						<SelectItem value="popular">Popular</SelectItem>
-						<SelectItem value="upcoming">Upcoming</SelectItem>
-					</SelectContent>
-				</Select>
-
-				<Select
-					value={filters.genre ?? "all"}
-					onValueChange={(value) => onFilterChanged({ type: "genre", value: value !== "all" ? value : undefined })}
-				>
-					<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
-						<SelectValue placeholder="Genre" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">All</SelectItem>
-						{getGenres(data.data).map((genre, idx) => {
-							return (
-								<SelectItem key={idx} value={genre}>
-									{genre}
-								</SelectItem>
-							);
-						})}
-					</SelectContent>
-				</Select>
-
-				<Select
-					value={filters.episodes ?? "all"}
-					onValueChange={(value) => {
-						const isEpisodes = (value: string): value is "1-12" | "12-24" | "24+" => {
-							if (value === "1-12") {
-								return true;
+		<>
+			<Head>
+				<title>{properCase(getTypeQuery())} Animes</title>
+			</Head>
+			<div className="grid w-11/12 max-w-[1280px] md:w-2/3 m-auto">
+				<div className="grid grid-cols-3 justify-center gap-x-3 p-5">
+					<Select
+						value={getTypeQuery()}
+						onValueChange={(value) => {
+							if (!isSection(value)) {
+								return;
 							}
-							if (value === "12-24") {
-								return true;
-							}
-							if (value === "24+") {
-								return true;
-							}
-							return false;
-						};
 
-						onFilterChanged({
-							type: "episodes",
-							value: isEpisodes(value) ? value : undefined,
+							router.push(`/animes?type=${value}`);
+						}}
+					>
+						<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
+							<SelectValue placeholder="Type" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="airing">Airing</SelectItem>
+							<SelectItem value="popular">Popular</SelectItem>
+							<SelectItem value="upcoming">Upcoming</SelectItem>
+						</SelectContent>
+					</Select>
+
+					<Select
+						value={filters.genre ?? "all"}
+						onValueChange={(value) => onFilterChanged({ type: "genre", value: value !== "all" ? value : undefined })}
+					>
+						<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
+							<SelectValue placeholder="Genre" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">All</SelectItem>
+							{getGenres(data.data).map((genre, idx) => {
+								return (
+									<SelectItem key={idx} value={genre}>
+										{genre}
+									</SelectItem>
+								);
+							})}
+						</SelectContent>
+					</Select>
+
+					<Select
+						value={filters.episodes ?? "all"}
+						onValueChange={(value) => {
+							const isEpisodes = (value: string): value is "1-12" | "12-24" | "24+" => {
+								if (value === "1-12") {
+									return true;
+								}
+								if (value === "12-24") {
+									return true;
+								}
+								if (value === "24+") {
+									return true;
+								}
+								return false;
+							};
+
+							onFilterChanged({
+								type: "episodes",
+								value: isEpisodes(value) ? value : undefined,
+							});
+						}}
+					>
+						<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
+							<SelectValue placeholder="Episodes" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">All</SelectItem>
+							<SelectItem value="1-12">1-12</SelectItem>
+							<SelectItem value="12-24">12-24</SelectItem>
+							<SelectItem value="24+">24+</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
+
+				<AnimeResults data={filteredData ?? data.data} />
+
+				<Pagination
+					page={pageQuery()}
+					totalPages={data.pagination.last_visible_page}
+					nextPage={() => {
+						router.push(window.location.href, {
+							query: {
+								type: router.query.type,
+								page: pageQuery() + 1,
+							},
 						});
 					}}
-				>
-					<SelectTrigger className="w-[100px] m-auto md:w-[150px]">
-						<SelectValue placeholder="Episodes" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">All</SelectItem>
-						<SelectItem value="1-12">1-12</SelectItem>
-						<SelectItem value="12-24">12-24</SelectItem>
-						<SelectItem value="24+">24+</SelectItem>
-					</SelectContent>
-				</Select>
+					prevPage={() => {
+						router.push(window.location.href, {
+							query: {
+								type: router.query.type,
+								page: pageQuery() - 1,
+							},
+						});
+					}}
+				/>
 			</div>
-
-			<AnimeResults data={filteredData ?? data.data} />
-
-			<Pagination
-				page={pageQuery()}
-				totalPages={data.pagination.last_visible_page}
-				nextPage={() => {
-					router.push(window.location.href, {
-						query: {
-							type: router.query.type,
-							page: pageQuery() + 1,
-						},
-					});
-				}}
-				prevPage={() => {
-					router.push(window.location.href, {
-						query: {
-							type: router.query.type,
-							page: pageQuery() - 1,
-						},
-					});
-				}}
-			/>
-		</div>
+		</>
 	);
 }
