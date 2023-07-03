@@ -154,7 +154,7 @@ export default function Anime({ anime }: { anime: JikanAnime }) {
 					{anime.score !== null && (
 						<div>
 							<h3>Community Rating</h3>
-							<Ratings value={configureRating()} readOnly />
+							<Ratings value={configureRating()} readOnly size={25} />
 						</div>
 					)}
 

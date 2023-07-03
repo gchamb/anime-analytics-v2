@@ -1,11 +1,12 @@
 import { Star } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 
 type RatingsProps = {
 	readOnly?: true;
 	value?: Rating;
 	onRatingChanged?: (rating: Rating) => void;
+	size?: number;
 };
 
 export const ratingSchema = z.union([
@@ -18,14 +19,8 @@ export const ratingSchema = z.union([
 ]);
 export type Rating = z.infer<typeof ratingSchema>;
 
-export default function Ratings({ readOnly, value, onRatingChanged }: RatingsProps) {
+export default function Ratings({ readOnly, value, onRatingChanged, size }: RatingsProps) {
 	const [rating, setRating] = useState<Rating>(value ?? 0);
-
-	useEffect(() => {
-		if (!readOnly) {
-			onRatingChanged?.(rating);
-		}
-	}, [onRatingChanged, rating, readOnly]);
 
 	return (
 		<div className="flex gap-x-1">
@@ -34,7 +29,7 @@ export default function Ratings({ readOnly, value, onRatingChanged }: RatingsPro
 					<Star
 						id={`${num}`}
 						key={num}
-						className="text-yellow-400"
+						className={`text-yellow-400 ${size ? `w-[${size}px] md:w-[${size}px]` : "w-[16px] md:w-[20px]"}`}
 						onMouseOver={(e) => {
 							if (readOnly) {
 								return;
@@ -47,6 +42,10 @@ export default function Ratings({ readOnly, value, onRatingChanged }: RatingsPro
 								return;
 							}
 
+							if (!readOnly) {
+								onRatingChanged?.(parsedId.data);
+							}
+
 							setRating(parsedId.data);
 						}}
 						onMouseLeave={(e) => {
@@ -57,6 +56,9 @@ export default function Ratings({ readOnly, value, onRatingChanged }: RatingsPro
 							const { left } = e.currentTarget.getBoundingClientRect();
 							if (rating === 1 && e.clientX < left) {
 								setRating(0);
+								if (!readOnly) {
+									onRatingChanged?.(0);
+								}
 							}
 						}}
 						fill={num <= rating ? "gold" : "transparent"}

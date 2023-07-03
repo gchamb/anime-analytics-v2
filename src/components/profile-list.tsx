@@ -20,7 +20,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DialogHeader, Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import { FullScreen } from "./full-screen";
 
-
 const fetcher = (url: string): Promise<{ list: Omit<List, "userId">[]; pages: number }> =>
 	fetch(url).then((res) => res.json());
 

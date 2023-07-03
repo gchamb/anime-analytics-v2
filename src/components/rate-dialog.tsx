@@ -36,7 +36,7 @@ export default function RateDialog({ open, animeName, onClose, onSubmit }: RateD
 				</DialogHeader>
 				<div className="flex flex-col items-center gap-2">
 					{error && <span className="text-center text-red-800 font-bold text-sm">{error}</span>}
-					<Ratings onRatingChanged={(rate) => setRate(rate)} />
+					<Ratings onRatingChanged={(rate) => setRate(rate)} size={30} />
 					<div className="flex flex-col gap-2">
 						{!hideCalendar && (
 							<Calendar
