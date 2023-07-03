@@ -181,8 +181,9 @@ export default function Profile() {
 				<>
 					<Head>
 						<title>
-							{`${properCase(typeof router.query.user === "string" ? router.query.user.split("-").join(" ") : "")}'s`}
-							Profile
+							{`${properCase(
+								typeof router.query.user === "string" ? router.query.user.split("-").join(" ") : ""
+							)}'s Profile`}
 						</title>
 					</Head>
 					<div>
