@@ -59,6 +59,9 @@ export default async function getProfileHandler(
             listType: "rate",
           },
           take: 10,
+          orderBy: {
+            year: "desc",
+          }
         })
       ).map(({ imageUrl, id, malId }) => {
         return { imageUrl, id, malId };

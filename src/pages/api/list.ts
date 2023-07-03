@@ -28,7 +28,6 @@ export default async function listHandler(
                     return res.status(400).json({ error: "Invalid Request Body" });
                 }
                 username = username.split("-").join(" ");
-                
 
                 const user = await prisma.user.findUnique({ where: { username } })
 
@@ -43,7 +42,11 @@ export default async function listHandler(
 
                 const skip = (page - 1) * LIST_MAX;
 
-                const userList = await prisma.list.findMany({ where: { userId: user.id, listType: list }, skip, take: LIST_MAX });
+                const userList = await prisma.list.findMany({
+                    where: { userId: user.id, listType: list }, skip, take: LIST_MAX, orderBy: {
+                        year: "desc"
+                    }
+                });
                 const listCount = await prisma.list.count({ where: { userId: user.id, listType: list } })
 
                 const specificList = userList.map(({ userId, ...rec }) => {
