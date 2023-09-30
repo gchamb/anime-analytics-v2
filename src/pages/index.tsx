@@ -134,7 +134,7 @@ export const getStaticProps: GetStaticProps = async () => {
 			airing,
 			popular,
 			upcoming,
-			revalidate: 86400,
 		},
+		revalidate: 86400,
 	};
 };
