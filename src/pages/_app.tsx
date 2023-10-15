@@ -23,8 +23,18 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
 					content="anime, browse anime, track anime, share anime, anime analytics, anime app, anime recommendations, anime tracking, anime community, anime statistics, anime insights"
 				/>
 				<meta property="og:image" content="https://anime-analytics.vercel.app/aa-og-card.png" />
+				<meta property="og:title" content="Anime Analytics"></meta>
+				<meta
+					property="og:description"
+					content="Discover, collaborate, and analyze your favorite animes with our all-in-one application. Browse an extensive collection, track your progress, share recommendations, and gain valuable analytics insights. Elevate your anime experience like never before. Try it now!"
+				/>
 				<meta name="twitter:image" content="https://anime-analytics.vercel.app/aa-twitter-card.png" />
 				<meta name="twitter:card" content="summary_large_image" />
+				<meta property="twitter:title" content="Anime Analytics"></meta>
+				<meta
+					property="twitter:description"
+					content="Discover, collaborate, and analyze your favorite animes with our all-in-one application. Browse an extensive collection, track your progress, share recommendations, and gain valuable analytics insights. Elevate your anime experience like never before. Try it now!"
+				></meta>
 				<link rel="icon" href="/logo.png" />
 			</Head>
 			<main className={`${inter.className} h-screen`}>
