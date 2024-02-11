@@ -29,7 +29,7 @@ const Home: React.FC<{
 					<div className="w-11/12 m-auto flex flex-col gap-y-2 max-w-[1280px] md:w-2/3">
 						<h1 className="font-bold text-2xl text-center md:text-left dark:text-aa-3">Airing Animes</h1>
 						<div className="flex flex-col gap-y-2 bg-aa-1 p-5 rounded-md dark:bg-aa-dark-1">
-							<div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
+							<div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-6">
 								{airing.map((anime, idx) => {
 									return (
 										<AnimeCover key={idx} image={anime.image} name={anime.title} href={`/animes/${anime.mal_id}`} />
@@ -49,7 +49,7 @@ const Home: React.FC<{
 					<div className="w-11/12 m-auto flex flex-col gap-y-2 max-w-[1280px] md:w-2/3">
 						<h1 className="font-bold text-2xl text-center md:text-left dark:text-aa-3">Popular Animes</h1>
 						<div className="flex flex-col gap-y-2 bg-aa-1  p-5 rounded-md dark:bg-aa-dark-1">
-							<div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
+							<div className="grid grid-cols-3 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
 								{popular.map((anime, idx) => {
 									return (
 										<AnimeCover key={idx} image={anime.image} name={anime.title} href={`/animes/${anime.mal_id}`} />
@@ -69,7 +69,7 @@ const Home: React.FC<{
 					<div className="w-11/12 m-auto flex flex-col gap-y-2 max-w-[1280px] md:w-2/3">
 						<h1 className="font-bold text-2xl text-center md:text-left dark:text-aa-3">Upcoming Animes</h1>
 						<div className="flex flex-col gap-y-2 bg-aa-1 p-5 rounded-md dark:bg-aa-dark-1">
-							<div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
+							<div className="grid grid-cols-3 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
 								{upcoming.map((anime, idx) => {
 									return (
 										<AnimeCover key={idx} image={anime.image} name={anime.title} href={`/animes/${anime.mal_id}`} />
