@@ -1,7 +1,7 @@
-import prisma from "@/server/prisma";
+import prisma from "@/src/server/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { deleteFile } from "@uploadcare/rest-client";
-import { uploadcareSimpleAuthSchema } from "@/server/upload-care";
+import { uploadcareSimpleAuthSchema } from "@/src/server/upload-care";
 
 export default async function getProfileHandler(
   req: NextApiRequest,
@@ -61,7 +61,7 @@ export default async function getProfileHandler(
           take: 10,
           orderBy: {
             year: "desc",
-          }
+          },
         })
       ).map(({ imageUrl, id, malId }) => {
         return { imageUrl, id, malId };
@@ -115,7 +115,6 @@ export default async function getProfileHandler(
       return res.status(200).end();
     }
   } catch (err) {
-
     if (req.method === "GET") res.json({ error: "Unable to fetch user." });
     return res.json({ error: "Unable to save changes." });
   }

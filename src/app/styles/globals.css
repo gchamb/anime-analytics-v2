@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-	color-scheme: light dark;
+  color-scheme: light dark;
 }
 
 * {
-	box-sizing: border-box;
-	padding: 0;
-	margin: 0;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 html,
 body,
 #__next {
-	height: 100vh;
+  height: 100vh;
 }

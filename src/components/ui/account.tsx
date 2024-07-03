@@ -3,72 +3,68 @@ import UsernameDialog from "../required-username-dialog";
 import React from "react";
 
 import { LogOut, User } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
 } from "./dropdown-menu";
-import { useRouter } from "next/router";
+import Link from "next/link";
+import { getServerSession } from "next-auth";
 
-export default function Account() {
-	const { status, data, update } = useSession();
-	const router = useRouter();
-	const showUsernameModal = () => {
-		return (
-			status === "authenticated" &&
-			(data.user.username === null || data.user.username === undefined || data.user.username.trim() === "")
-		);
-	};
+export default async function Account() {
+  const session = await getServerSession();
 
-	return (
-		<>
-			{showUsernameModal() && <UsernameDialog open onClose={() => update()} />}
-			{status === "authenticated" ? (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<User className="cursor-pointer text-black dark:text-white hover:text-aa-4 dark:hover:text-aa-3" />
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel className="text-center text-black dark:text-white">My Account</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							className="flex cursor-pointer gap-2 text-black dark:text-white"
-							onClick={() => {
-								if (
-									data === null ||
-									data.user.username === null ||
-									data.user.username === undefined ||
-									data.user.username === ""
-								) {
-									return;
-								}
+  let urlUsername = "";
 
-								const urlUsername = data.user.username.split(" ").join("-");
+  // if (
+  //   session &&
+  //   session.user.nickname !== undefined &&
+  //   session.user.nickname !== null
+  // ) {
+  //   urlUsername = session.user.username.split(" ").join("-");
+  // }
 
-								router.push(`/${urlUsername}`);
-							}}
-						>
-							<User className="w-4" />
-							Profile
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							className="flex cursor-pointer gap-2 text-black dark:text-white"
-							onClick={() => signOut()}
-						>
-							<LogOut className="w-4" />
-							Logout
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			) : (
-				<SignIn>
-					<h1 className="font-semibold cursor-pointer hover:text-aa-4 dark:hover:text-aa-3">Sign In</h1>
-				</SignIn>
-			)}
-		</>
-	);
+  console.log(session);
+
+  return (
+    <>
+      {session && <UsernameDialog open onClose={() => {}} />}
+      {session ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <User className="cursor-pointer text-black dark:text-white hover:text-aa-4 dark:hover:text-aa-3" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel className="text-center text-black dark:text-white">
+              My Account
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <Link href={`/${urlUsername}`}>
+              <DropdownMenuItem className="flex cursor-pointer gap-2 text-black dark:text-white">
+                <User className="w-4" />
+                Profile
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuItem
+              className="flex cursor-pointer gap-2 text-black dark:text-white"
+              onClick={() => signOut()}
+            >
+              <LogOut className="w-4" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <SignIn>
+          <h1 className="font-semibold cursor-pointer hover:text-aa-4 dark:hover:text-aa-3">
+            Sign In
+          </h1>
+        </SignIn>
+      )}
+    </>
+  );
 }
