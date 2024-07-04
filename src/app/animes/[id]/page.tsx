@@ -1,7 +1,7 @@
 import AnimeCover from "@/components/anime-cover";
 import Chip from "@/components/ui/chip";
 import ListButton from "@/components/ui/list-button";
-import Ratings, { Rating, ratingSchema } from "@/components/ui/ratings";
+import Ratings from "@/components/ui/ratings";
 import useSWRMutation from "swr/mutation";
 import RateDialog from "@/components/rate-dialog";
 // import Head from "next/head";
@@ -99,15 +99,13 @@ export default async function Anime({ params }: { params: { id: string } }) {
   //   }
   // };
 
-  const configureRating = (): Rating => {
+  const configureRating = () => {
     const rating = anime.score ? Math.floor(anime.score / 2) : 0;
-    const parse = ratingSchema.safeParse(rating);
-
-    if (!parse.success) {
+    if (rating > 5 || rating < 0) {
       return 0;
     }
 
-    return parse.data;
+    return rating;
   };
 
   return (

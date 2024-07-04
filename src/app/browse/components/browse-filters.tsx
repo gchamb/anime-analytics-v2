@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Chip from "@/components/ui/chip";
-import { jikanAnimeGenres, JikanStatus } from "@/lib/jikan/types";
+import { jikanAnimeGenres } from "@/lib/jikan/types";
 import {
   Select,
   SelectTrigger,

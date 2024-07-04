@@ -1,4 +1,3 @@
-"use client";
 import "@/app/styles/globals.css";
 import Navigation from "../components/ui/navigation";
 import { Inter } from "next/font/google";
@@ -16,7 +15,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`bg-aa-0 dark:bg-aa-dark-0 ${inter.className} h-screen`}>
         {/* <SessionProvider session={session}> */}
-        {/* <Navigation /> */}
+        <Navigation />
         {children}
         {/* </SessionProvider> */}
       </body>

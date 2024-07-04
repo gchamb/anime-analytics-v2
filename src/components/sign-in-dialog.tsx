@@ -17,7 +17,7 @@ type SignInProps = {
 
 export default function SignIn(props: SignInProps) {
   const [error, setError] = useState("");
-
+  
   return (
     <Dialog>
       <DialogTrigger>{props.children}</DialogTrigger>
@@ -42,7 +42,7 @@ export default function SignIn(props: SignInProps) {
                 return;
               }
 
-              if (res.error !== undefined) {
+              if (res.error !== null) {
                 setError(res.error);
               }
             }}
@@ -57,7 +57,7 @@ export default function SignIn(props: SignInProps) {
                 return;
               }
 
-              if (res.error !== undefined) {
+              if (res.error !== null) {
                 setError(res.error);
               }
             }}

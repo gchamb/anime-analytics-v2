@@ -13,26 +13,22 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import Link from "next/link";
-import { getServerSession } from "next-auth";
+import { Session } from "next-auth";
 
-export default async function Account() {
-  const session = await getServerSession();
-
+export default function Account({ session }: { session: Session | null }) {
   let urlUsername = "";
 
-  // if (
-  //   session &&
-  //   session.user.nickname !== undefined &&
-  //   session.user.nickname !== null
-  // ) {
-  //   urlUsername = session.user.username.split(" ").join("-");
-  // }
-
+  if (
+    session &&
+    session.user?.username !== undefined &&
+    session.user?.username !== null
+  ) {
+    urlUsername = session.user.username.split(" ").join("-");
+  }
   console.log(session);
-
   return (
     <>
-      {session && <UsernameDialog open onClose={() => {}} />}
+      {session?.user.username === null && <UsernameDialog />}
       {session ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -51,7 +47,7 @@ export default async function Account() {
             </Link>
             <DropdownMenuItem
               className="flex cursor-pointer gap-2 text-black dark:text-white"
-              onClick={() => signOut()}
+              // onClick={() => signOut()}
             >
               <LogOut className="w-4" />
               Logout

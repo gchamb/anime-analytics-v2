@@ -1,17 +1,15 @@
 "use client";
-import { ratingSchema } from "@/lib/types";
+
 import { Star } from "lucide-react";
 import React, { useState } from "react";
 import { z } from "zod";
 
 type RatingsProps = {
   readOnly?: true;
-  value?: Rating;
-  onRatingChanged?: (rating: Rating) => void;
+  value?: number;
+  onRatingChanged?: (rating: number) => void;
   size?: number;
 };
-
-export type Rating = z.infer<typeof ratingSchema>;
 
 export default function Ratings({
   readOnly,
@@ -19,7 +17,7 @@ export default function Ratings({
   onRatingChanged,
   size,
 }: RatingsProps) {
-  const [rating, setRating] = useState<Rating>(value ?? 0);
+  const [rating, setRating] = useState<number>(value ?? 0);
 
   return (
     <div className="flex gap-x-1">
@@ -38,16 +36,16 @@ export default function Ratings({
 
               const { id } = e.currentTarget;
 
-              const parsedId = ratingSchema.safeParse(Number(id));
-              if (!parsedId.success) {
+              let convertedId = parseInt(id);
+              if (convertedId > 5 || convertedId < 0) {
                 return;
               }
 
               if (!readOnly) {
-                onRatingChanged?.(parsedId.data);
+                onRatingChanged?.(convertedId);
               }
 
-              setRating(parsedId.data);
+              setRating(convertedId);
             }}
             onMouseLeave={(e) => {
               if (readOnly) {

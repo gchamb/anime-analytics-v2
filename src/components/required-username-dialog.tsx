@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { isValidUsername } from "../lib/types/validators";
+import { Loader2 } from "lucide-react";
 
 async function updateUsername(url: string, { arg }: { arg: string }) {
   return fetch(url, {
@@ -22,11 +23,12 @@ async function updateUsername(url: string, { arg }: { arg: string }) {
   });
 }
 
-export default function UsernameDialog(props: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  const { trigger } = useSWRMutation("/api/user/username", updateUsername);
+export default function UsernameDialog() {
+  const [open, setOpen] = useState(true);
+  const { trigger, isMutating } = useSWRMutation(
+    "/api/user/username",
+    updateUsername
+  );
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
 
@@ -44,13 +46,14 @@ export default function UsernameDialog(props: {
         const { error } = (await response.json()) as { error: string };
         setError(error);
       } else {
-        props.onClose();
+        setOpen(false);
+        window.location.reload();
       }
     }
   };
 
   return (
-    <Dialog open={props.open}>
+    <Dialog open={open}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">
@@ -76,10 +79,11 @@ export default function UsernameDialog(props: {
             onChange={(e) => setUsername(e.currentTarget.value)}
           />
           <Button
-            disabled={username === ""}
+            disabled={username === "" || isMutating}
             variant="subtle"
             onClick={checkUsername}
           >
+            {isMutating && <Loader2 className="animate-spin" />}
             Save Username
           </Button>
         </div>

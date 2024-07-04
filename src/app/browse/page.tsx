@@ -1,4 +1,3 @@
-// "use client";
 // import AnimeResults from "../../components/anime-results";
 // import Pagination from "../../components/pagination";
 // import Chip from "../../components/ui/chip";
@@ -8,7 +7,6 @@
 import { jikan } from "@/lib/jikan";
 import {
   JikanAnimeGenres,
-  JikanGenres,
   JikanStatus,
   jikanStatusSchema,
 } from "@/lib/jikan/types";

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { JikanAnime, JikanAnimeGenres } from "../jikan/types";
 import { getGenres } from "../utils";
-import { Rating } from "../../components/ui/ratings";
 
 export const Sections = {
   airing: "airing",
@@ -92,7 +91,7 @@ export const profileViewRequestSchema = z
 export type ProfileViewRequest = z.infer<typeof profileViewRequestSchema>;
 
 export const ratingDataSchema = z.object<{
-  [key in Rating]: z.ZodArray<typeof ListRowSchema>;
+  [key in 0 | 1 | 2 | 3 | 4 | 5]: z.ZodArray<typeof ListRowSchema>;
 }>({
   0: z.array(ListRowSchema),
   1: z.array(ListRowSchema),
@@ -203,14 +202,6 @@ export function isListType(data: unknown): data is ListType {
 
   return true;
 }
-export const ratingSchema = z.union([
-  z.literal(0),
-  z.literal(1),
-  z.literal(2),
-  z.literal(3),
-  z.literal(4),
-  z.literal(5),
-]);
 
 export const isEpisodes = (
   value: string
