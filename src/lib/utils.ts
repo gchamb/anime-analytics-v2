@@ -76,11 +76,18 @@ export const filteredData = (
   return filteredAnimes;
 };
 
-export const createQueryString = (params: { [key: string]: string }) => {
+export const createQueryString = (params: {
+  [key: string]: string | string[];
+}) => {
   const url = new URL(window.location.href);
 
   for (const [key, value] of Object.entries(params)) {
-    url.searchParams.set(key, value);
+    let myValue = value;
+    if (Array.isArray(myValue)) {
+      myValue = myValue.join(",");
+    }
+
+    url.searchParams.set(key, myValue);
   }
 
   return url.toString();

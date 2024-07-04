@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type JikanResponse = {
   data: JikanAnime[];
   pagination: JikanPagination;
@@ -82,7 +84,12 @@ export type JikanAnime = {
   demographics: JikanDemographics[];
 };
 
-export type JikanStatus = "airing" | "complete" | "upcoming";
+export const jikanStatusSchema = z.union([
+  z.literal("airing"),
+  z.literal("complete"),
+  z.literal("upcoming"),
+]);
+export type JikanStatus = z.infer<typeof jikanStatusSchema>;
 
 export const DAYS = [
   "sunday",
