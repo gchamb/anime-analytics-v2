@@ -1,80 +1,52 @@
 import AnimeResults from "../../components/anime-results";
-import React, { useMemo, useState } from "react";
-import Pagination from "../../components/pagination";
-import useSwr from "swr";
-import Head from "next/head";
-
-import { Sections, isSection } from "../../lib/types";
-import {
-  getGenres,
-  getTypeQuery,
-  pageQuery,
-  properCase,
-} from "../../lib/utils";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { FullScreen } from "../../components/full-screen";
-import { JikanAnime, JikanOption, JikanResponse } from "../../lib/jikan/types";
-import { Jikan, jikan } from "../../lib/jikan";
+import React, { cache } from "react";
 import Filters from "./components/filters";
+import Pagination from "../../components/pagination";
 
-const filteredData = (
-  data: JikanAnime[],
-  params: { genre: string | undefined; episodes: string | undefined }
-) => {
-  let filteredAnimes = data;
+import { Sections } from "../../lib/types";
+import { filteredData } from "../../lib/utils";
+import { jikan } from "../../lib/jikan";
+import { z } from "zod";
 
-  if (params.episodes !== undefined) {
-    filteredAnimes = filteredAnimes.filter((anime) => {
-      if (anime.episodes === null) {
-        return;
-      }
-      if (params.episodes === "1-12") {
-        return anime.episodes >= 1 && anime.episodes <= 12;
-      } else if (params.episodes === "12-24") {
-        return anime.episodes >= 12 && anime.episodes <= 24;
-      } else {
-        return anime.episodes >= 24;
-      }
-    });
-  }
-
-  if (params.genre !== undefined) {
-    filteredAnimes = filteredAnimes?.filter((anime) => {
-      const currentAnimeGenres = getGenres(anime);
-
-      return currentAnimeGenres.includes(params.genre!);
-    });
-  }
-
-  return filteredAnimes;
+const JikanData = (type: keyof typeof Sections, page: number) => {
+  return jikan.getTopAnimes("tv", Sections[type], page);
 };
 
 export default async function Animes({
-  params,
   searchParams,
 }: {
-  params: { slug: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  let type = searchParams?.type;
-  let genre = searchParams?.genre;
-  let episodes = searchParams?.episodes;
+  const animesFilterSchema = z.object({
+    type: z
+      .union([z.literal("airing"), z.literal("upcoming"), z.literal("popular")])
+      .optional(),
+    genre: z.string().optional().or(z.string().min(0).max(3)),
+    episodes: z
+      .union([z.literal("1-12"), z.literal("12-24"), z.literal("24+")])
+      .optional()
+      .or(z.string().min(0).max(3)),
+    page: z
+      .string()
+      .refine((arg) => !isNaN(parseInt(arg)))
+      .optional(),
+  });
 
-  if (typeof type !== "string" || !isSection(type ?? "")) {
-    type = "airing";
-  }
-  if (typeof genre !== "string" && genre !== undefined) {
-    genre = undefined;
-  }
-  if (typeof episodes !== "string" && episodes !== undefined) {
-    episodes = undefined;
+  const valid = animesFilterSchema.safeParse(searchParams);
+
+  if (!valid.success) {
+    return (
+      <div className="flex justify-center items-center w-full h-4/5">
+        <h1 className="text-2xl font-semibold">Invalid Request.</h1>
+      </div>
+    );
   }
 
-  const data = await jikan.getTopAnimes(
-    "tv",
-    type === "popular" ? "bypopularity" : (type as JikanOption["filter"])
-  );
+  const { type, genre, episodes, page } = valid.data;
+
+  const data = await JikanData(type ?? "airing", parseInt(page ?? "1"));
+
+  const animes = filteredData(data.data, { genre, episodes });
 
   return (
     <div className="grid w-11/12 max-w-[1280px] md:w-2/3 m-auto">
@@ -86,7 +58,12 @@ export default async function Animes({
           episodes: episodes,
         }}
       />
-      <AnimeResults data={data.data} />
+      <AnimeResults data={animes} />
+
+      <Pagination
+        page={parseInt(page ?? "1")}
+        totalPages={data.pagination.last_visible_page}
+      />
     </div>
   );
 }

@@ -36,6 +36,56 @@ export function getEpisodeGroup(episodes: number): "0-12" | "12-24" | "24+" {
   }
 }
 
+export const filteredData = (
+  data: JikanAnime[],
+  params: { genre: string | undefined; episodes: string | undefined }
+) => {
+  let filteredAnimes = data;
+
+  if (
+    params.episodes !== undefined &&
+    params.episodes !== "" &&
+    params.episodes !== "all"
+  ) {
+    filteredAnimes = filteredAnimes.filter((anime) => {
+      if (anime.episodes === null) {
+        return;
+      }
+      if (params.episodes === "1-12") {
+        return anime.episodes >= 1 && anime.episodes <= 12;
+      } else if (params.episodes === "12-24") {
+        return anime.episodes >= 12 && anime.episodes <= 24;
+      } else {
+        return anime.episodes >= 24;
+      }
+    });
+  }
+
+  if (
+    params.genre !== undefined &&
+    params.genre !== "" &&
+    params.genre !== "all"
+  ) {
+    filteredAnimes = filteredAnimes?.filter((anime) => {
+      const currentAnimeGenres = getGenres(anime);
+
+      return currentAnimeGenres.includes(params.genre!);
+    });
+  }
+
+  return filteredAnimes;
+};
+
+export const createQueryString = (params: { [key: string]: string }) => {
+  const url = new URL(window.location.href);
+
+  for (const [key, value] of Object.entries(params)) {
+    url.searchParams.set(key, value);
+  }
+
+  return url.toString();
+};
+
 export function pageQuery(): number {
   if (typeof window === "undefined") {
     return 1;
@@ -103,13 +153,15 @@ export const getGenresQuery = (): JikanAnimeGenres[] => {
 
     return validGenres;
   } catch {
-    return []
+    return [];
   }
+};
 
-}
-
-export const getStatusQuery = (): "airing" | "complete" | "upcoming" | undefined => {
-
+export const getStatusQuery = ():
+  | "airing"
+  | "complete"
+  | "upcoming"
+  | undefined => {
   if (typeof window === "undefined") {
     return undefined;
   }
@@ -126,12 +178,10 @@ export const getStatusQuery = (): "airing" | "complete" | "upcoming" | undefined
     return undefined;
   }
 
-
   return status;
-}
+};
 
 export const getTypeQuery = (): keyof typeof Sections => {
-
   if (typeof window === "undefined") {
     return "airing";
   }
@@ -145,29 +195,37 @@ export const getTypeQuery = (): keyof typeof Sections => {
   }
 
   if (!isSection(type)) {
-    return "airing"
+    return "airing";
   }
 
-
   return type;
-}
+};
 
-
-
-export const getTranformedDate = (date: Date): { year: number; month: Months } => {
-  return { year: date.getFullYear(), month: monthsSchema.options[date.getMonth()].value }
-}
+export const getTranformedDate = (
+  date: Date
+): { year: number; month: Months } => {
+  return {
+    year: date.getFullYear(),
+    month: monthsSchema.options[date.getMonth()].value,
+  };
+};
 
 export function properCase(name: string) {
   if (name.includes("-")) {
-    return name.split("-").map((name) => {
-      const firstChar = name.charAt(0).toUpperCase();
-      return firstChar + name.substring(1, name.length).toLowerCase();
-    }).join(" ")
+    return name
+      .split("-")
+      .map((name) => {
+        const firstChar = name.charAt(0).toUpperCase();
+        return firstChar + name.substring(1, name.length).toLowerCase();
+      })
+      .join(" ");
   }
 
-  return name.split(" ").map((name) => {
-    const firstChar = name.charAt(0).toUpperCase();
-    return firstChar + name.substring(1, name.length).toLowerCase();
-  }).join(" ")
+  return name
+    .split(" ")
+    .map((name) => {
+      const firstChar = name.charAt(0).toUpperCase();
+      return firstChar + name.substring(1, name.length).toLowerCase();
+    })
+    .join(" ");
 }

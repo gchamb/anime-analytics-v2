@@ -1,7 +1,7 @@
 "use client";
 
-import { getGenres } from "@/lib/utils";
-import { useMemo, useState } from "react";
+import { createQueryString, getGenres } from "@/lib/utils";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { JikanAnime } from "@/lib/jikan/types";
 import { Button } from "@/components/ui/button";
-import { isEpisodes, isSection, Sections } from "@/lib/types";
+import { isSection, Sections } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
 export default function Filters({
@@ -28,18 +28,13 @@ export default function Filters({
   const [section, setSection] = useState<keyof typeof Sections>(
     params.type ?? "airing"
   );
-  const [genre, setGenre] = useState<string | undefined>(params.genre);
-  const [episodes, setEpisodes] = useState<string | undefined>(params.episodes);
+  const [genre, setGenre] = useState<string | undefined>(
+    params.genre === "" ? undefined : params.genre
+  );
+  const [episodes, setEpisodes] = useState<string | undefined>(
+    params.episodes === "" ? undefined : params.episodes
+  );
   const router = useRouter();
-
-  const createQueryString = () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("type", section);
-    url.searchParams.set("genre", genre ?? "");
-    url.searchParams.set("episodes", episodes ?? "");
-
-    return url.toString();
-  };
 
   return (
     <div className="grid grid-cols-4 justify-center gap-x-3 p-5">
@@ -81,9 +76,6 @@ export default function Filters({
       <Select
         value={episodes ?? "all"}
         onValueChange={(value) => {
-          if (!isEpisodes(value)) {
-            return;
-          }
           setEpisodes(value);
         }}
       >
@@ -100,7 +92,12 @@ export default function Filters({
       <Button
         variant="subtle"
         onClick={() => {
-          router.push(createQueryString());
+          const url = createQueryString({
+            type: section,
+            genre: genre ?? "",
+            episodes: episodes ?? "",
+          });
+          router.push(url);
         }}
       >
         Apply

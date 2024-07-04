@@ -1,11 +1,13 @@
 "use client";
+import { createQueryString } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 type PaginationProps = {
   page: number;
   totalPages: number;
-  nextPage: () => void;
-  prevPage: () => void;
+  nextPage?: () => void;
+  prevPage?: () => void;
   className?: string;
 };
 
@@ -16,6 +18,7 @@ export default function Pagination({
   prevPage,
   className,
 }: PaginationProps) {
+  const router = useRouter();
   return (
     <div
       className={`justify-self-center flex gap-x-2  text-center items-center pb-2 ${className}`}
@@ -24,7 +27,14 @@ export default function Pagination({
         <Button
           variant="ghost"
           size="sm"
-          onClick={prevPage}
+          onClick={() => {
+            const res = prevPage?.();
+
+            if (res === undefined) {
+              const url = createQueryString({ page: `${page - 1}` });
+              router.push(url);
+            }
+          }}
           disabled={page === 1}
         >
           Prev
@@ -37,7 +47,14 @@ export default function Pagination({
         <Button
           variant="ghost"
           size="sm"
-          onClick={nextPage}
+          onClick={() => {
+            const res = nextPage?.();
+
+            if (res === undefined) {
+              const url = createQueryString({ page: `${page + 1}` });
+              router.push(url);
+            }
+          }}
           disabled={page === totalPages}
         >
           Next
