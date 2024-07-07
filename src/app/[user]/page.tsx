@@ -1,493 +1,261 @@
-// "use client";
-// import useSWR from "swr";
-// import useSWRMutation from "swr/mutation";
-// import ProfileList from "../../components/profile-list";
-// import ProfileAnalytics from "../../components/profile-analytics";
-// import AnimeCover from "../../components/anime-cover";
-// import Head from "next/head";
+import prisma from "@/server/prisma";
+import ShowMore from "./components/show-more";
+import AnimeCover from "@/components/anime-cover";
+import ListView from "./components/list-view";
+import AnalyticsView from "./components/analytics-view";
+import ProfileDetails from "./components/profile-details";
+import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { ArrowRight } from "lucide-react";
+import { z } from "zod";
+import { List } from "@prisma/client";
+import { getAnalytics } from "@/lib/utils";
 
-// import { uploadFile } from "@uploadcare/upload-client";
-// import { z } from "zod";
-// import { useRouter } from "next/router";
-// import { ArrowRight, Edit2, Loader2 } from "lucide-react";
-// import { ListType, ListRowSchema } from "../../lib/types";
-// import { FullScreen } from "../../components/full-screen";
-// import { Button } from "../../components/ui/button";
-// import { useRef, useState } from "react";
-// import { useSession } from "next-auth/react";
-// import { Textarea } from "../../components/ui/text-area";
-// import { properCase } from "../../lib/utils";
+const LIST_MAX = 18;
 
-// const fetcher = async (
-//   url: string
-// ): Promise<{
-//   watch: z.infer<typeof ListRowSchema>[];
-//   plan: z.infer<typeof ListRowSchema>[];
-//   rate: z.infer<typeof ListRowSchema>[];
-//   bio: string | null;
-//   image: string | undefined;
-// }> => fetch(url).then((res) => res.json());
+export default async function Profile({
+  params,
+  searchParams,
+}: {
+  params: { user: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  const session = await getServerSession(authOptions);
 
-// const fetcherMutation = async (
-//   url: string,
-//   { arg }: { arg: { bio?: string; image?: string } }
-// ) => {
-//   return fetch(url, {
-//     method: "PATCH",
-//     body: JSON.stringify(arg),
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   });
-// };
+  let username = params.user;
+  if (typeof username !== "string") {
+    return "";
+  }
+  username = username.split("-").join(" ");
 
-// export default function Profile() {
-//   const [nowEditable, setNowEditable] = useState(false);
-//   const [bio, setBio] = useState<string | undefined>(undefined);
-//   const [image, setImage] = useState<File | undefined>(undefined);
-//   const [validationError, setValidationError] = useState({
-//     profilePicError: "",
-//     bioError: "",
-//     generalError: "",
-//   });
-//   let imageUploadRef = useRef<HTMLInputElement | null>(null);
+  const usernameExist = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  });
 
-//   const router = useRouter();
-//   const session = useSession();
-//   const { user } = router.query;
-//   const { data, error, isLoading } = useSWR(
-//     user !== undefined
-//       ? `/api/user/profile?username=${router.query.user}`
-//       : null,
-//     fetcher
-//   );
-//   const {
-//     trigger,
-//     isMutating,
-//     error: profileError,
-//   } = useSWRMutation(
-//     user !== undefined
-//       ? `/api/user/profile?username=${router.query.user}`
-//       : null,
-//     fetcherMutation
-//   );
+  if (usernameExist === null) {
+    return (
+      <div className="flex justify-center items-center w-full h-4/5">
+        <h1 className="text-2xl font-semibold">User doesn't exist.</h1>
+      </div>
+    );
+  }
 
-//   const canSaveChanges =
-//     validationError.bioError === "" && validationError.profilePicError === "";
+  const profileQueryParams = z.object({
+    view: z.union([z.literal("list"), z.literal("analytics")]).optional(),
+    list: z
+      .union([z.literal("watch"), z.literal("rate"), z.literal("plan")])
+      .optional(),
+    page: z
+      .string()
+      .refine((arg) => !isNaN(parseInt(arg)))
+      .optional(),
+    year: z
+      .string()
+      .min(4)
+      .refine((arg) => !isNaN(parseInt(arg)))
+      .optional(),
+  });
 
-//   const viewQuery = z
-//     .union([z.literal("list"), z.literal("analytics")])
-//     .optional()
-//     .safeParse(router.query.view);
+  const validParams = profileQueryParams.safeParse(searchParams);
 
-//   const viewChanger = (
-//     option:
-//       | { view: "list"; list: Exclude<ListType, "delete"> }
-//       | { view: "analytics" }
-//   ) => {
-//     const url = new URL(window.location.href);
-//     url.searchParams.set("view", option.view);
+  if (!validParams.success) {
+    return (
+      <div className="flex justify-center items-center w-full h-4/5">
+        <h1 className="text-2xl font-semibold">Invalid Request.</h1>
+      </div>
+    );
+  }
 
-//     if (option.view === "list") {
-//       url.searchParams.set("list", option.list);
-//       url.searchParams.set("page", "1");
+  let { view, page: queryPage, list, year } = validParams.data;
 
-//       router.push(url);
-//       return;
-//     }
+  if (view === "list") {
+    list = list ?? "watch";
+    const page = parseInt(queryPage ?? "1");
 
-//     router.push(url);
-//   };
+    const skip = (page - 1) * LIST_MAX;
 
-//   const saveChanges = async () => {
-//     try {
-//       let imageUid: string | undefined = undefined;
-//       if (image !== undefined) {
-//         // upload image
-//         const result = await uploadFile(image, {
-//           publicKey: "5bf97c741b9939d6c42e",
-//           store: "auto",
-//         });
-//         imageUid = result.uuid;
-//       }
+    const data = await prisma.list.findMany({
+      where: {
+        userId: usernameExist.id,
+        listType: list,
+      },
+      skip,
+      take: LIST_MAX,
+      orderBy: {
+        year: "desc",
+      },
+    });
 
-//       const response = await trigger({
-//         bio,
-//         image: imageUid,
-//       });
+    const listCount = await prisma.list.count({
+      where: { userId: usernameExist.id, listType: list },
+    });
 
-//       if (!response?.ok) {
-//         const validRes = z
-//           .object({ error: z.string() })
-//           .safeParse(await response?.json());
+    const listData = data.map(({ userId, ...rec }) => {
+      return rec;
+    });
 
-//         if (validRes.success) {
-//           throw new Error(validRes.data.error);
-//         }
-//       }
+    return (
+      <ListView
+        list={list}
+        page={page}
+        data={listData}
+        pages={Math.ceil(listCount / LIST_MAX)}
+        isOwner={session?.user.id === usernameExist.id}
+      />
+    );
+  }
 
-//       setNowEditable(false);
-//     } catch (error) {
-//       setValidationError((prev) => {
-//         return {
-//           ...prev,
-//           generalError: error instanceof Error ? error.message : String(error),
-//         };
-//       });
-//     }
-//   };
+  if (view === "analytics") {
+    let listResults: List[];
 
-//   const getProfilePic = () => {
-//     if (image !== undefined) {
-//       return URL.createObjectURL(image);
-//     }
-//     if (data !== undefined && data.image !== undefined) {
-//       if (data.image.includes("google") || data.image.includes("discord")) {
-//         return data.image;
-//       }
+    if (year === undefined) {
+      listResults = await prisma.list.findMany({
+        where: {
+          userId: usernameExist.id,
+          listType: "rate",
+        },
+      });
+    } else {
+      listResults = await prisma.list.findMany({
+        where: {
+          userId: usernameExist.id,
+          year: parseInt(year),
+          listType: "rate",
+        },
+      });
+    }
 
-//       return `https://ucarecdn.com/${data.image}/`;
-//     }
+    // aggregate the data
+    const analytics = getAnalytics(listResults, year === undefined);
 
-//     return "/logo.png";
-//   };
+    const currentYear = parseInt(year ?? "NaN");
+    return (
+      <AnalyticsView
+        username={username}
+        data={analytics}
+        currentYear={currentYear}
+        years={analytics.years}
+      />
+    );
+  }
 
-//   const showError = (): string => {
-//     if (validationError.bioError !== "") {
-//       return validationError.bioError;
-//     }
-//     if (validationError.profilePicError !== "") {
-//       return validationError.profilePicError;
-//     }
-//     if (validationError.generalError !== "") {
-//       return validationError.generalError;
-//     }
-//     if (profileError) {
-//       return profileError instanceof Error
-//         ? profileError.message
-//         : String(profileError);
-//     }
+  // Default Profile View
+  const watch = (
+    await prisma.list.findMany({
+      where: {
+        userId: usernameExist.id,
+        listType: "watch",
+      },
+      take: 10,
+    })
+  ).map(({ imageUrl, id, malId }) => {
+    return { imageUrl, id, malId };
+  });
+  const plan = (
+    await prisma.list.findMany({
+      where: {
+        userId: usernameExist.id,
+        listType: "plan",
+      },
+      take: 10,
+    })
+  ).map(({ imageUrl, id, malId }) => {
+    return { imageUrl, id, malId };
+  });
+  const rate = (
+    await prisma.list.findMany({
+      where: {
+        userId: usernameExist.id,
+        listType: "rate",
+      },
+      take: 10,
+      orderBy: {
+        year: "desc",
+      },
+    })
+  ).map(({ imageUrl, id, malId }) => {
+    return { imageUrl, id, malId };
+  });
 
-//     return "";
-//   };
+  return (
+    <div className="w-11/12 mx-auto max-w-[2000px]">
+      <h1 className="text-center text-5xl lg:hidden">{username}</h1>
+      <div className="flex flex-col gap-10 h-full md:flex-row">
+        <ProfileDetails
+          profileBio={usernameExist.bio}
+          isOwner={session?.user.id === usernameExist.id}
+          username={username}
+          profileImage={usernameExist.image}
+        />
+        <div className="w-full h-full grid auto-cols-fr md:grid-rows-3 p-2 gap-5">
+          <div className="m-auto w-11/12">
+            <ShowMore username={username} listType="watch" />
+            {watch.length > 0 && (
+              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+                {watch.map((watchAnime) => {
+                  return (
+                    <AnimeCover
+                      key={watchAnime.id}
+                      image={watchAnime.imageUrl}
+                      name=""
+                      dontShowName
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-//   if (!viewQuery.success) {
-//     return (
-//       <FullScreen>
-//         <h1 className="text-2xl font-bold">Invalid View Query.</h1>
-//       </FullScreen>
-//     );
-//   }
-
-//   if (error !== undefined) {
-//     return (
-//       <FullScreen>
-//         <h1 className="text-2xl font-bold">
-//           {error instanceof Error ? error.message : String(error)}{" "}
-//         </h1>
-//       </FullScreen>
-//     );
-//   }
-
-//   if (isLoading || data === undefined) {
-//     return (
-//       <FullScreen>
-//         <Loader2 className="w-20 h-20 animate-spin text-aa-2 dark:text-aa-3" />
-//       </FullScreen>
-//     );
-//   }
-
-//   return (
-//     <>
-//       {viewQuery.data === undefined && (
-//         <>
-//           <Head>
-//             <title>
-//               {`${properCase(
-//                 typeof router.query.user === "string"
-//                   ? router.query.user.split("-").join(" ")
-//                   : ""
-//               )}'s`}
-//               Profile
-//             </title>
-//           </Head>
-//           <div>
-//             {/* validate to make sure it is valid */}
-//             <h1 className="text-center text-5xl lg:hidden">
-//               {typeof user === "string" && user.split("-").join(" ")}
-//             </h1>
-//             <div className="flex flex-col gap-10 h-full md:flex-row">
-//               <div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
-//                 {session.status === "authenticated" &&
-//                   typeof user === "string" &&
-//                   session.data?.user.username?.toLowerCase() ===
-//                     user.split("-").join(" ").toLowerCase() && (
-//                     <Button
-//                       className="absolute right-1"
-//                       variant="ghost"
-//                       onClick={() => {
-//                         if (nowEditable) {
-//                           setBio(data.bio ?? "");
-//                           setImage(undefined);
-//                           setValidationError({
-//                             profilePicError: "",
-//                             bioError: "",
-//                             generalError: "",
-//                           });
-//                           setNowEditable(false);
-//                           return;
-//                         }
-
-//                         setNowEditable(true);
-//                       }}
-//                       disabled={isMutating}
-//                     >
-//                       <Edit2 />
-//                     </Button>
-//                   )}
-
-//                 <div className="flex flex-col gap-2">
-//                   <div className="relative w-[150px] h-[150px] mx-auto">
-//                     <img
-//                       className="w-full h-full rounded-full"
-//                       src={getProfilePic()}
-//                       alt="profile pic"
-//                     />
-//                   </div>
-//                   {nowEditable && !isMutating && (
-//                     <Button
-//                       className="w-1/2 mx-auto"
-//                       variant="outline"
-//                       onClick={() => {
-//                         if (imageUploadRef.current === null) {
-//                           return;
-//                         }
-
-//                         imageUploadRef.current.click();
-//                       }}
-//                     >
-//                       Upload
-//                     </Button>
-//                   )}
-//                   <input
-//                     className="hidden"
-//                     ref={(ref) => {
-//                       imageUploadRef.current = ref;
-//                     }}
-//                     type="file"
-//                     accept="image/*"
-//                     onChange={(e) => {
-//                       const { files } = e.target;
-
-//                       if (files === null || files.length === 0) {
-//                         return;
-//                       }
-
-//                       const file = files[0];
-
-//                       if (file.size > 5_000_000) {
-//                         setValidationError((prev) => {
-//                           return {
-//                             ...prev,
-//                             profilePicError: "Image is bigger than 5MB",
-//                           };
-//                         });
-//                       }
-
-//                       const mime = file.type.split("/")[0].trim();
-//                       if (mime !== "image") {
-//                         setValidationError((prev) => {
-//                           return {
-//                             ...prev,
-//                             profilePicError: "This file isn't an image",
-//                           };
-//                         });
-//                       }
-
-//                       if (file.size <= 5_000_000 && mime === "image") {
-//                         if (validationError.profilePicError !== "") {
-//                           setValidationError((prev) => {
-//                             return { ...prev, profilePicError: "" };
-//                           });
-//                         }
-//                       }
-
-//                       setImage(file);
-//                     }}
-//                   />
-//                   <h1 className="text-center text-5xl font-semibold">
-//                     {typeof user === "string" && user.split("-").join(" ")}
-//                   </h1>
-//                 </div>
-
-//                 {!nowEditable ? (
-//                   <p className="my-auto text-center">{data.bio ?? "No Bio."}</p>
-//                 ) : (
-//                   <>
-//                     {isMutating ? (
-//                       <Loader2 className="w-20 h-20 m-auto animate-spin text-aa-2 dark:text-aa-3" />
-//                     ) : (
-//                       <Textarea
-//                         placeholder="Tell us a little bit about yourself"
-//                         maxLength={150}
-//                         className="my-auto text-center h-[120px] resize-none border-aa-dark-1 dark:border-aa-2"
-//                         value={bio === undefined ? data.bio ?? "" : bio}
-//                         onChange={(e) => {
-//                           const text = e.currentTarget.value;
-
-//                           setBio(text);
-
-//                           if (text.length > 150) {
-//                             setValidationError((prev) => {
-//                               return {
-//                                 ...prev,
-//                                 bioError: "Bio is greater than 150 characters.",
-//                               };
-//                             });
-//                           } else {
-//                             if (validationError.bioError !== "") {
-//                               setValidationError((prev) => {
-//                                 return {
-//                                   ...prev,
-//                                   bioError: "",
-//                                 };
-//                               });
-//                             }
-//                           }
-//                         }}
-//                       />
-//                     )}
-//                   </>
-//                 )}
-//                 {showError() !== "" && (
-//                   <p className="text-sm text-red-500">{showError()}</p>
-//                 )}
-//                 {nowEditable && (
-//                   <Button
-//                     variant="outline"
-//                     className="mt-auto"
-//                     onClick={saveChanges}
-//                     disabled={!canSaveChanges || isMutating}
-//                   >
-//                     Save Changes
-//                   </Button>
-//                 )}
-//               </div>
-//               <div className="w-full h-full grid auto-cols-fr md:grid-rows-3  p-2 gap-5 ">
-//                 <div className="m-auto w-11/12">
-//                   <div className="flex items-center">
-//                     <h1 className="text-xl">Watch List</h1>
-//                     <button
-//                       className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-//                       onClick={() =>
-//                         viewChanger({ view: "list", list: "watch" })
-//                       }
-//                     >
-//                       Show
-//                       <ArrowRight />
-//                     </button>
-//                   </div>
-
-//                   {data.watch.length !== 0 && (
-//                     <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-//                       {data.watch.map((watchAnime) => {
-//                         return (
-//                           <AnimeCover
-//                             key={watchAnime.id}
-//                             image={watchAnime.imageUrl}
-//                             name=""
-//                             dontShowName
-//                           />
-//                         );
-//                       })}
-//                     </div>
-//                   )}
-//                 </div>
-//                 <div className="m-auto w-11/12">
-//                   <div className="flex items-center">
-//                     <h1 className="text-xl">Plan List</h1>
-//                     <button
-//                       className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-//                       onClick={() =>
-//                         viewChanger({ view: "list", list: "plan" })
-//                       }
-//                     >
-//                       Show
-//                       <ArrowRight />
-//                     </button>
-//                   </div>
-//                   {data.plan.length !== 0 && (
-//                     <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-//                       {data.plan.map((planAnime) => {
-//                         return (
-//                           <AnimeCover
-//                             key={planAnime.id}
-//                             image={planAnime.imageUrl}
-//                             dontShowName
-//                             name=""
-//                           />
-//                         );
-//                       })}
-//                     </div>
-//                   )}
-//                 </div>
-//                 <div className="m-auto w-11/12">
-//                   <div className="flex items-center">
-//                     <h1 className="text-xl">Rate List</h1>
-//                     <button
-//                       className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-//                       onClick={() =>
-//                         viewChanger({ view: "list", list: "rate" })
-//                       }
-//                     >
-//                       Show
-//                       <ArrowRight />
-//                     </button>
-//                   </div>
-//                   {data.rate.length !== 0 && (
-//                     <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
-//                       {data.rate.map((rateAnime) => {
-//                         return (
-//                           <AnimeCover
-//                             key={rateAnime.id}
-//                             image={rateAnime.imageUrl}
-//                             dontShowName
-//                             name=""
-//                           />
-//                         );
-//                       })}
-//                     </div>
-//                   )}
-//                 </div>
-//                 <div className="mt-5 mx-auto w-11/12">
-//                   <button
-//                     className="ml-auto md:mr-0 flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-//                     onClick={() => viewChanger({ view: "analytics" })}
-//                   >
-//                     Analytics
-//                     <ArrowRight />
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-
-//       {viewQuery.data === "list" && (
-//         <ProfileList
-//           username={
-//             typeof router.query.user === "string" ? router.query.user : ""
-//           }
-//         />
-//       )}
-//       {viewQuery.data === "analytics" && (
-//         <ProfileAnalytics
-//           username={
-//             typeof router.query.user === "string" ? router.query.user : ""
-//           }
-//         />
-//       )}
-//     </>
-//   );
-// }
+          <div className="m-auto w-11/12">
+            <ShowMore username={username} listType="plan" />
+            {plan.length !== 0 && (
+              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+                {plan.map((planAnime) => {
+                  return (
+                    <AnimeCover
+                      key={planAnime.id}
+                      image={planAnime.imageUrl}
+                      dontShowName
+                      name=""
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="m-auto w-11/12">
+            <ShowMore username={username} listType="rate" />
+            {rate.length !== 0 && (
+              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+                {rate.map((rateAnime) => {
+                  return (
+                    <AnimeCover
+                      key={rateAnime.id}
+                      image={rateAnime.imageUrl}
+                      dontShowName
+                      name=""
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="mt-5 mx-auto w-11/12">
+            <div className="flex justify-end">
+              <Link
+                href={`?view=analytics`}
+                className="ml-auto md:mr-0 flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+              >
+                Analytics
+                <ArrowRight />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

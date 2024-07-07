@@ -1,6 +1,7 @@
 import "@/app/styles/globals.css";
 import Navigation from "../components/ui/navigation";
 import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,11 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`bg-aa-0 dark:bg-aa-dark-0 ${inter.className} h-screen`}>
-        {/* <SessionProvider session={session}> */}
-        <Navigation />
-        {children}
-        {/* </SessionProvider> */}
+      <body className={`dark bg-aa-dark-0 ${inter.className}`}>
+        <main className="h-screen">
+          <Navigation />
+          {children}
+        </main>
+        <Toaster />
       </body>
     </html>
   );

@@ -1,9 +1,3 @@
-// import AnimeResults from "../../components/anime-results";
-// import Pagination from "../../components/pagination";
-// import Chip from "../../components/ui/chip";
-// import useSwr from "swr";
-// import Head from "next/head";
-
 import { jikan } from "@/lib/jikan";
 import {
   JikanAnimeGenres,
@@ -15,44 +9,6 @@ import { z } from "zod";
 import BrowseFilters from "./components/browse-filters";
 import AnimeResults from "@/components/anime-results";
 import Pagination from "@/components/pagination";
-
-// import { FullScreen } from "../../components/full-screen";
-// import { Button } from "../../components/ui/button";
-// import { Input } from "../../components/ui/input";
-// import {
-//   getGenresQuery,
-//   getQuery,
-//   getStatusQuery,
-//   pageQuery,
-// } from "../../lib/utils";
-// import { Loader2 } from "lucide-react";
-// import { useRouter } from "next/router";
-// import { useState } from "react";
-// import {
-//   Select,
-//   SelectTrigger,
-//   SelectValue,
-//   SelectContent,
-//   SelectItem,
-// } from "../../components/ui/select";
-// import {
-//   DropdownMenu,
-//   DropdownMenuCheckboxItem,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuSeparator,
-//   DropdownMenuTrigger,
-// } from "../../components/ui/dropdown-menu";
-// import {
-//   JikanAnimeGenres,
-//   JikanGenresMap,
-//   JikanResponse,
-//   jikanAnimeGenres,
-// } from "../../lib/jikan/types";
-// import { jikan } from "../../lib/jikan";
-
-// const fetcher = (url: string): Promise<JikanResponse> =>
-//   fetch(url).then((res) => res.json());
 
 const searchJikan = cache(
   async ({
@@ -86,11 +42,14 @@ export default async function Browse({
       .optional(),
   });
 
-  console.log(searchParams);
   const valid = browseFilterSchema.safeParse(searchParams);
 
   if (!valid.success) {
-    return "ERROR";
+    return (
+      <div className="flex justify-center items-center w-full h-4/5">
+        <h1 className="text-2xl font-semibold">Invalid Request.</h1>
+      </div>
+    );
   }
 
   const { query, status, genres, page } = valid.data;
@@ -119,33 +78,3 @@ export default async function Browse({
     </div>
   );
 }
-
-// export default function Browse() {
-
-//   }
-
-//   if (data === undefined) {
-//     return (
-//       <FullScreen>
-//         <div>
-//           <h1 className="text-3xl font-bold">Unable to fetch animes.</h1>
-//           <p>Try to refresh</p>
-//         </div>
-//       </FullScreen>
-//     );
-//   }
-
-//   return (
-//     <>
-//       <Head>
-//         <title>Browse</title>
-//       </Head>
-//       <div className="flex flex-col w-11/12 max-w-[1280px] h-5/6  m-auto">
-//
-
-//         <AnimeResults data={data.data} />
-//         {data.data.length > 0 && (
-//
-//     </>
-//   );
-// }

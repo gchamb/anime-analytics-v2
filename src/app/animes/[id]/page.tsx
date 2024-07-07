@@ -6,7 +6,7 @@ import useSWRMutation from "swr/mutation";
 import RateDialog from "@/components/rate-dialog";
 // import Head from "next/head";
 
-import { Jikan } from "@/lib/jikan";
+import { jikan, Jikan } from "@/lib/jikan";
 import { JikanAnime } from "@/lib/jikan/types";
 import {
   Methods,
@@ -18,7 +18,7 @@ import {
 import { getGenres } from "@/lib/utils";
 
 import { getSession, useSession } from "next-auth/react";
-import { useState } from "react";
+import { cache, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -26,26 +26,31 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-async function listRequestFetcher(
-  url: string,
-  {
-    arg,
-  }: {
-    arg: {
-      method: Methods;
-      listRequestData: AnimeListRequest | BasicListRequest;
-    };
-  }
-) {
-  return fetch(url, {
-    method: arg.method,
-    body: JSON.stringify({ listData: arg.listRequestData }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
+// async function listRequestFetcher(
+//   url: string,
+//   {
+//     arg,
+//   }: {
+//     arg: {
+//       method: Methods;
+//       listRequestData: AnimeListRequest | BasicListRequest;
+//     };
+//   }
+// ) {
+//   return fetch(url, {
+//     method: arg.method,
+//     body: JSON.stringify({ listData: arg.listRequestData }),
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+// }
+
+const fetchAnime = cache((malId: number) => {
+  return jikan.getAnime(malId);
+});
 
 export default async function Anime({ params }: { params: { id: string } }) {
   if (params === undefined) {
@@ -55,11 +60,9 @@ export default async function Anime({ params }: { params: { id: string } }) {
   if (isNaN(malId) || (!isNaN(malId) && malId < 1)) {
   }
 
-  // const session = await getServerSession();
-  // console.log(session);
+  const session = await getServerSession(authOptions);
 
-  const jikan = new Jikan();
-  const { data: anime } = await jikan.getAnime(malId);
+  const { data: anime } = await fetchAnime(malId);
 
   // const [openRateDialog, setOpenRateDialog] = useState(false);
   // const [error, setError] = useState("");
@@ -204,12 +207,7 @@ export default async function Anime({ params }: { params: { id: string } }) {
             </div>
           )}
 
-          {/* {status === "authenticated" && (
-            <ListButton
-              hide={["delete"]}
-              handleListRequest={handleListRequest}
-            />
-          )} */}
+          {session && <ListButton anime={anime} />}
 
           <div className="grid grid-flow-col auto-cols-fr justify-between gap-2">
             {getGenres(anime).length > 0 && (

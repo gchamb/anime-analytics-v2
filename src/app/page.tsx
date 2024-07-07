@@ -1,26 +1,30 @@
 // import Head from "next/head";
 
-import React from "react";
+import React, { cache } from "react";
 import AnimeCover from "../components/anime-cover";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Jikan } from "../lib/jikan";
+import { jikan, Jikan } from "../lib/jikan";
 import { JikanPreview, JikanResponse } from "../lib/jikan/types";
 import { ArrowRight } from "lucide-react";
+
+const fetchSections = cache(() => {
+  return Promise.all([
+    jikan.getTopAnimes("tv", "airing"),
+    jikan.getTopAnimes("tv", "bypopularity"),
+    jikan.getTopAnimes("tv", "upcoming"),
+  ]);
+});
 
 export default async function Home() {
   let airingAnimes: JikanResponse;
   let popularAnimes: JikanResponse;
   let upcomingAnimes: JikanResponse;
 
-  const jikan = new Jikan();
   // show the top airing, top animes, and top upcoming animes
-  const sections = await Promise.all([
-    jikan.getTopAnimes("tv", "airing"),
-    jikan.getTopAnimes("tv", "bypopularity"),
-    jikan.getTopAnimes("tv", "upcoming"),
-  ]);
+
+  const sections = await fetchSections();
 
   airingAnimes = sections[0];
   popularAnimes = sections[1];

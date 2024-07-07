@@ -1,4 +1,3 @@
-"use client";
 import Link from "next/link";
 import React from "react";
 import { AspectRatio } from "./ui/aspect-ratio";

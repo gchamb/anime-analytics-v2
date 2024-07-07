@@ -1,5 +1,5 @@
 "use client";
-import Ratings, { Rating, ratingSchema } from "./ui/ratings";
+import Ratings from "./ui/ratings";
 
 import { Calendar } from "./ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
@@ -13,7 +13,7 @@ type RateDialogProps = {
   open: boolean;
   animeName: string;
   onClose: () => void;
-  onSubmit: (rate: Rating, date: Date) => void;
+  onSubmit: (rate: 0 | 1 | 2 | 3 | 4 | 5, date: Date) => void;
 };
 
 export default function RateDialog({
@@ -24,7 +24,7 @@ export default function RateDialog({
 }: RateDialogProps) {
   const [hideCalendar, setHideCalendar] = useState(true);
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [rate, setRate] = useState<Rating>(0);
+  const [rate, setRate] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
   const [error, setError] = useState("");
 
   return (
@@ -46,7 +46,16 @@ export default function RateDialog({
               {error}
             </span>
           )}
-          <Ratings onRatingChanged={(rate) => setRate(rate)} size={30} />
+          <Ratings
+            onRatingChanged={(rate) => {
+              if (rate > 5 || rate < 0) {
+                return;
+              }
+
+              setRate(rate as 0 | 1 | 2 | 3 | 4 | 5);
+            }}
+            size={30}
+          />
           <div className="flex flex-col gap-2">
             {!hideCalendar && (
               <Calendar
@@ -73,13 +82,12 @@ export default function RateDialog({
             variant="subtle"
             onClick={() => {
               // error check
-              const parsedRating = ratingSchema.safeParse(rate);
-              const parsedDate = z.date().safeParse(date);
-
-              if (!parsedRating.success) {
+              if (rate > 5 || rate < 0) {
                 setError("You must submit a valid rate.");
                 return;
               }
+
+              const parsedDate = z.date().safeParse(date);
 
               if (!parsedDate.success) {
                 setError("You must submit a date.");
