@@ -2,7 +2,6 @@ import prisma from "@/server/prisma";
 import { isValidUsername } from "@/lib/types/validators";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { revalidatePath } from "next/cache";
 
 export const POST = async (req: Request) => {
   // validate username

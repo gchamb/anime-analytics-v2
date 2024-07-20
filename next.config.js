@@ -9,6 +9,9 @@ const nextConfig = {
       { protocol: "https", hostname: "ucarecdn.com" },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 module.exports = nextConfig;

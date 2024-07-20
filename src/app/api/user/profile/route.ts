@@ -3,7 +3,6 @@ import { deleteFile } from "@uploadcare/rest-client";
 import { uploadcareSimpleAuthSchema } from "@/server/upload-care";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { revalidatePath } from "next/cache";
 
 export const PATCH = async (req: Request) => {
   const params = new URL(req.url);

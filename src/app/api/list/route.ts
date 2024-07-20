@@ -1,5 +1,4 @@
 import prisma from "@/server/prisma";
-import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import {
@@ -9,7 +8,6 @@ import {
   isListType,
 } from "@/lib/types";
 import { getTranformedDate } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
 
 const LIST_MAX = 18;
 

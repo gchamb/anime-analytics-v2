@@ -2,51 +2,12 @@ import AnimeCover from "@/components/anime-cover";
 import Chip from "@/components/ui/chip";
 import ListButton from "@/components/ui/list-button";
 import Ratings from "@/components/ui/ratings";
-import useSWRMutation from "swr/mutation";
-import RateDialog from "@/components/rate-dialog";
-// import Head from "next/head";
 
-import { jikan, Jikan } from "@/lib/jikan";
-import { JikanAnime } from "@/lib/jikan/types";
-import {
-  Methods,
-  AnimeListRequest,
-  BasicListRequest,
-  ListType,
-  formulateAnimeListRequest,
-} from "@/lib/types";
+import { jikan } from "@/lib/jikan";
 import { getGenres } from "@/lib/utils";
-
-import { getSession, useSession } from "next-auth/react";
-import { cache, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { cache } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
-// async function listRequestFetcher(
-//   url: string,
-//   {
-//     arg,
-//   }: {
-//     arg: {
-//       method: Methods;
-//       listRequestData: AnimeListRequest | BasicListRequest;
-//     };
-//   }
-// ) {
-//   return fetch(url, {
-//     method: arg.method,
-//     body: JSON.stringify({ listData: arg.listRequestData }),
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   });
-// }
 
 const fetchAnime = cache((malId: number) => {
   return jikan.getAnime(malId);
@@ -64,44 +25,6 @@ export default async function Anime({ params }: { params: { id: string } }) {
 
   const { data: anime } = await fetchAnime(malId);
 
-  // const [openRateDialog, setOpenRateDialog] = useState(false);
-  // const [error, setError] = useState("");
-  // const [success, setSuccess] = useState("");
-  // const { status } = useSession();
-  // const { trigger } = useSWRMutation("/api/list", listRequestFetcher);
-
-  // const handleListRequest = async (list: ListType) => {
-  //   if (list === "delete") {
-  //     return;
-  //   }
-
-  //   // show dialog for rating
-  //   if (list === "rate") {
-  //     setOpenRateDialog(true);
-  //     return;
-  //   }
-
-  //   // formulate list request for data
-  //   const animeListRequest = formulateAnimeListRequest(anime, list);
-  //   const response = await trigger({
-  //     method: "POST",
-  //     listRequestData: animeListRequest,
-  //   });
-
-  //   if (response !== undefined) {
-  //     if (!response.ok) {
-  //       const err = (await response.json()) as { error: string };
-  //       setError(err.error);
-  //     } else {
-  //       setSuccess(
-  //         `You successfully added ${animeListRequest.animeName} to ${animeListRequest.listRequestType} list`
-  //       );
-  //     }
-
-  //     setOpenRateDialog(false);
-  //   }
-  // };
-
   const configureRating = () => {
     const rating = anime.score ? Math.floor(anime.score / 2) : 0;
     if (rating > 5 || rating < 0) {
@@ -116,80 +39,6 @@ export default async function Anime({ params }: { params: { id: string } }) {
       {/* <Head>
         <title>{anime.title}</title>
       </Head> */}
-      {/* {openRateDialog && (
-        <RateDialog
-          open={openRateDialog}
-          animeName={anime.title}
-          onClose={() => setOpenRateDialog(false)}
-          onSubmit={async (rate, date) => {
-            // for watching and planning send request immediately
-            // show dialog for rating
-            const animeListRequest = formulateAnimeListRequest(anime, "rate");
-            animeListRequest.rate = rate;
-            animeListRequest.ratedAt = date.toISOString();
-
-            const response = await trigger({
-              method: "POST",
-              listRequestData: animeListRequest,
-            });
-
-            if (response !== undefined) {
-              if (!response.ok) {
-                const err = (await response.json()) as { error: string };
-                setError(err.error);
-              } else {
-                setSuccess(
-                  `You successfully added ${animeListRequest.animeName} to ${animeListRequest.listRequestType} list`
-                );
-              }
-
-              setOpenRateDialog(false);
-            }
-          }}
-        />
-      )} */}
-      {/* {error !== "" && (
-        <Dialog
-          open
-          onOpenChange={(open) => {
-            if (!open) {
-              setError("");
-            }
-          }}
-        >
-          <DialogContent showX>
-            <DialogHeader>
-              <DialogTitle className="flex gap-2 items-center text-2xl">
-                Error
-              </DialogTitle>
-            </DialogHeader>
-            <div>
-              <p>{error}</p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )} */}
-      {/* {success !== "" && (
-        <Dialog
-          open
-          onOpenChange={(open) => {
-            if (!open) {
-              setSuccess("");
-            }
-          }}
-        >
-          <DialogContent showX>
-            <DialogHeader>
-              <DialogTitle className="flex gap-2 items-center text-2xl">
-                Success
-              </DialogTitle>
-            </DialogHeader>
-            <div>
-              <p>{success}</p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )} */}
       <div className="w-11/12 h-max m-auto flex flex-col items-center pt-3 gap-5 lg:flex-row">
         <div className="flex flex-col gap-y-4 items-center text-center lg:w-1/2 lg:m-auto">
           <div className="w-[200px] xl:w-[250px]">

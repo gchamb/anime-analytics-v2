@@ -1,8 +1,9 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
+import prisma from "@/server/prisma";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
-import prisma from "@/server/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.SECRET as string,
