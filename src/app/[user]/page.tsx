@@ -38,7 +38,7 @@ export default async function Profile({
   if (usernameExist === null) {
     return (
       <div className="flex justify-center items-center w-full h-4/5">
-        <h1 className="text-2xl font-semibold">User doesn't exist.</h1>
+        <h1 className="text-2xl font-semibold">User doesn&apos;t exist.</h1>
       </div>
     );
   }
