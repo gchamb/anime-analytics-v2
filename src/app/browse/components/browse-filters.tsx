@@ -90,7 +90,7 @@ export default function BrowseFilters({
             className="m-auto min-w-[100px] min-h-[40px] p-1 md:min-w-[150px]"
             asChild
           >
-            <div className="inline-flex flex-wrap gap-1 items-center justify-center rounded-md text-sm font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-aa-2-400 focus:ring-offset-2 disabled:opacity-50 focus:ring-aa-2 disabled:pointer-events-none focus:ring-offset-slate-900  bg-transparent border border-black border-aa-3 text-slate-100 rounded">
+            <div className="inline-flex flex-wrap gap-1 items-center justify-center rounded-md text-sm font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-aa-2-400 focus:ring-offset-2 disabled:opacity-50 focus:ring-aa-2 disabled:pointer-events-none focus:ring-offset-slate-900  bg-transparent border  border-aa-3 text-slate-100 rounded">
               {genres.length > 0
                 ? genres.map((selectedGenre, idx) => (
                     <Chip key={idx} size="xs" text={selectedGenre} />
