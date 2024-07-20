@@ -102,7 +102,7 @@ export default function ProfileAnalytics({
         <div className="h-full grid ">
           {data !== undefined && (
             <>
-              <ChartView data={data} />
+              {/* <ChartView data={data} /> */}
               {/* {view === "CHART" ? (
                 <ChartView data={data} />
               ) : (
