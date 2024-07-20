@@ -14,7 +14,7 @@ export default function ShowMore({
       <h1 className="text-xl">{properCase(listType)} List</h1>
       <Link
         className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
-        href={`/${username}?view=list&list=${listType}`} // onClick={() => viewChanger({ view: "list", list: "watch" })}
+        href={`/${username.split(" ").join("-")}?view=list&list=${listType}`} // onClick={() => viewChanger({ view: "list", list: "watch" })}
       >
         Show
         <ArrowRight />
