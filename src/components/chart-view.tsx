@@ -1,88 +1,86 @@
-// "use client";
-// import MyChart from "./chart";
-// import { Analytics, ChartData } from "../lib/types";
-// import { useState, useEffect } from "react";
+"use client";
 
-// export default function ChartView({ data }: { data: Analytics }) {
-//   // const [isDarkMode, setIsDarkMode] = useState(false);
+import { Analytics, ChartData } from "@/lib/types";
+import { useEffect, useState } from "react";
 
-//   // useEffect(() => {
-//   //   const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
-//   //   setIsDarkMode(prefersDarkMode.matches);
+import MyChart from "./chart";
 
-//   //   const handleChange = (event: MediaQueryListEvent) => {
-//   //     setIsDarkMode(event.matches);
-//   //   };
+export default function ChartView({ data }: { data: Analytics }) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-//   //   prefersDarkMode.addEventListener("change", handleChange);
+  useEffect(() => {
+    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkMode(prefersDarkMode.matches);
 
-//   //   return () => {
-//   //     prefersDarkMode.removeEventListener("change", handleChange);
-//   //   };
-//   // }, []);
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsDarkMode(event.matches);
+    };
 
-//   return (
-//     <div className="h-3/4">
-//       {/* Bar */}
-//       <div className="grid grid-rows-4 md:grid-cols-2 md:grid-rows-none lg:grid-cols-4">
-//         {Object.keys(data.bar).map((key) => {
-//           const dataKey = key as keyof Analytics["bar"];
-//           const dataChartData = data.bar[dataKey];
+    prefersDarkMode.addEventListener("change", handleChange);
 
-//           const tranformData: { [key: string]: number } = {};
+    return () => {
+      prefersDarkMode.removeEventListener("change", handleChange);
+    };
+  }, []);
 
-//           for (const [key, arrayOfValues] of Object.entries(dataChartData)) {
-//             tranformData[key] = arrayOfValues.length;
-//           }
+  return (
+    <div className="h-3/4">
+      {/* Bar */}
+      <div className="grid grid-rows-4 md:grid-cols-2 md:grid-rows-none lg:grid-cols-4">
+        {Object.keys(data.bar).map((key) => {
+          const dataKey = key as keyof Analytics["bar"];
+          const dataChartData = data.bar[dataKey];
 
-//           const chartData: ChartData = {
-//             labels: Object.keys(tranformData),
-//             datasets: [
-//               {
-//                 data: Object.values(tranformData),
-//                 backgroundColor: isDarkMode ? "#dcb9ff" : "black",
-//               },
-//             ],
-//           };
+          const tranformData: { [key: string]: number } = {};
 
-//           return (
-//             <MyChart key={key} type="bar" title={dataKey} data={chartData} />
-//           );
-//         })}
-//       </div>
-//       {/* Circle */}
-//       <div className="grid grid-row-4 md:grid-cols-2 md:grid-row-none lg:grid-cols-4">
-//         {Object.keys(data.circle).map((key) => {
-//           const dataKey = key as keyof Analytics["circle"];
-//           const dataChartData = data.circle[dataKey];
+          for (const [key, arrayOfValues] of Object.entries(dataChartData)) {
+            tranformData[key] = arrayOfValues.length;
+          }
 
-//           const tranformData: { [key: string]: number } = {};
+          const chartData: ChartData = {
+            labels: Object.keys(tranformData),
+            datasets: [
+              {
+                data: Object.values(tranformData),
+                backgroundColor: isDarkMode ? "#dcb9ff" : "black",
+              },
+            ],
+          };
 
-//           for (const [key, arrayOfValues] of Object.entries(dataChartData)) {
-//             tranformData[key] = arrayOfValues.length;
-//           }
+          return (
+            <MyChart key={key} type="bar" title={dataKey} data={chartData} />
+          );
+        })}
+      </div>
+      {/* Circle */}
+      <div className="grid grid-row-4 md:grid-cols-2 md:grid-row-none lg:grid-cols-4">
+        {Object.keys(data.circle).map((key) => {
+          const dataKey = key as keyof Analytics["circle"];
+          const dataChartData = data.circle[dataKey];
 
-//           const chartData: ChartData = {
-//             labels: Object.keys(tranformData),
-//             datasets: [
-//               {
-//                 data: Object.values(tranformData),
-//                 backgroundColor: isDarkMode
-//                   ? ["#dcb9ff", "#3e2f4c", "#c286ff", "#a953ff", "#cf9fff"]
-//                   : ["#c286ff", "#291f33", "#3e2f4c", "#f5ecff", "#dcb9ff"],
-//               },
-//             ],
-//           };
+          const tranformData: { [key: string]: number } = {};
 
-//           return (
-//             <MyChart key={key} type="circle" title={dataKey} data={chartData} />
-//           );
-//         })}
-//       </div>
-//     </div>
-//   );
-// }
+          for (const [key, arrayOfValues] of Object.entries(dataChartData)) {
+            tranformData[key] = arrayOfValues.length;
+          }
 
-export default function ChartView() {
-  return;
+          const chartData: ChartData = {
+            labels: Object.keys(tranformData),
+            datasets: [
+              {
+                data: Object.values(tranformData),
+                backgroundColor: isDarkMode
+                  ? ["#dcb9ff", "#3e2f4c", "#c286ff", "#a953ff", "#cf9fff"]
+                  : ["#c286ff", "#291f33", "#3e2f4c", "#f5ecff", "#dcb9ff"],
+              },
+            ],
+          };
+
+          return (
+            <MyChart key={key} type="circle" title={dataKey} data={chartData} />
+          );
+        })}
+      </div>
+    </div>
+  );
 }

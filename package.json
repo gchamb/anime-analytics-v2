@@ -23,6 +23,7 @@
     "@uploadcare/rest-client": "^6.6.1",
     "@uploadcare/upload-client": "^6.6.1",
     "axios": "^1.3.4",
+    "chart.js": "^4.4.3",
     "class-variance-authority": "^0.4.0",
     "clsx": "^1.2.1",
     "date-fns": "^2.29.3",

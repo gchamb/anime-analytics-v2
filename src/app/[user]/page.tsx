@@ -111,6 +111,8 @@ export default async function Profile({
   if (view === "analytics") {
     let listResults: List[];
 
+    let years: number[] | undefined = undefined;
+
     if (year === undefined) {
       listResults = await prisma.list.findMany({
         where: {
@@ -119,6 +121,24 @@ export default async function Profile({
         },
       });
     } else {
+      // get years too
+
+      const queriedYears = await prisma.list.findMany({
+        select: {
+          year: true,
+        },
+        where: {
+          userId: usernameExist.id,
+          listType: "rate",
+        },
+      });
+
+      years = Array.from(
+        new Set(
+          queriedYears.map((data) => data.year).filter((year) => year !== null)
+        )
+      );
+
       listResults = await prisma.list.findMany({
         where: {
           userId: usernameExist.id,
@@ -136,8 +156,8 @@ export default async function Profile({
       <AnalyticsView
         username={username}
         data={analytics}
-        currentYear={currentYear}
-        years={analytics.years}
+        currentYear={isNaN(currentYear) ? undefined : currentYear}
+        years={analytics.years ?? years}
       />
     );
   }
