@@ -15,7 +15,7 @@ import { ListType, PutListRequestSchema, listType } from "../lib/types";
 import { List } from "@prisma/client";
 import { Loader2, MoreHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
-import Ratings, { Rating, ratingSchema } from "./ui/ratings";
+import Ratings from "./ui/ratings";
 import { useSession } from "next-auth/react";
 import {
   DropdownMenu,
@@ -89,7 +89,7 @@ export default function ProfileList({ username }: { username: string }) {
     id: string,
     animeName: string,
     type: ListType | "update",
-    rate?: Rating,
+    rate?: 0 | 1 | 2 | 3 | 4 | 5,
     ratedAt?: Date
   ) => {
     // function is for only mutating the current list of the authorized user
@@ -318,15 +318,7 @@ export default function ProfileList({ username }: { username: string }) {
                         />
                         {router.query.list === "rate" && (
                           <div className="flex justify-center">
-                            <Ratings
-                              readOnly
-                              value={
-                                ratingSchema.safeParse(animeListItem.rate)
-                                  .success
-                                  ? (animeListItem.rate as Rating)
-                                  : 0
-                              }
-                            />
+                            <Ratings readOnly value={animeListItem.rate ?? 5} />
                           </div>
                         )}
                         {session.data?.user.username?.toLowerCase() ===

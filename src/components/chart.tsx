@@ -16,7 +16,7 @@ type ChartProps =
 
 export default function Chart(props: ChartProps) {
   return (
-    <div className="m-1 p-1 flex flex-col gap-2 text-center rounded border bg-aa-1 border-aa-dark-1 dark:border-aa-2 dark:bg-aa-dark-1">
+    <div className="m-1 p-1 flex flex-col gap-2 text-center rounded border  border-aa-2 bg-aa-dark-1">
       <h1 className="font-semibold">{props.title}</h1>
       {props.type === "bar" ? (
         <Bar

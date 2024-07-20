@@ -6,23 +6,6 @@ import { useEffect, useState } from "react";
 import MyChart from "./chart";
 
 export default function ChartView({ data }: { data: Analytics }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
-    setIsDarkMode(prefersDarkMode.matches);
-
-    const handleChange = (event: MediaQueryListEvent) => {
-      setIsDarkMode(event.matches);
-    };
-
-    prefersDarkMode.addEventListener("change", handleChange);
-
-    return () => {
-      prefersDarkMode.removeEventListener("change", handleChange);
-    };
-  }, []);
-
   return (
     <div className="h-3/4">
       {/* Bar */}
@@ -42,7 +25,7 @@ export default function ChartView({ data }: { data: Analytics }) {
             datasets: [
               {
                 data: Object.values(tranformData),
-                backgroundColor: isDarkMode ? "#dcb9ff" : "black",
+                backgroundColor: "#dcb9ff",
               },
             ],
           };
@@ -69,9 +52,13 @@ export default function ChartView({ data }: { data: Analytics }) {
             datasets: [
               {
                 data: Object.values(tranformData),
-                backgroundColor: isDarkMode
-                  ? ["#dcb9ff", "#3e2f4c", "#c286ff", "#a953ff", "#cf9fff"]
-                  : ["#c286ff", "#291f33", "#3e2f4c", "#f5ecff", "#dcb9ff"],
+                backgroundColor: [
+                  "#dcb9ff",
+                  "#3e2f4c",
+                  "#c286ff",
+                  "#a953ff",
+                  "#cf9fff",
+                ],
               },
             ],
           };

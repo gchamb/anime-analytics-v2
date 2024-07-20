@@ -23,7 +23,7 @@ export default function SignIn(props: SignInProps) {
       <DialogTrigger>{props.children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold">
+          <DialogTitle className="text-center text-2xl font-bold text-white">
             Sign in
           </DialogTitle>
         </DialogHeader>

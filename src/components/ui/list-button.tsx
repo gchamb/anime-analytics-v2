@@ -123,7 +123,7 @@ export default function ListButton({ anime }: ListButtonProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            className="w-[50px] rounded-l-none border-l  dark:border-aa-3 focus:ring-0 focus:ring-offset-0"
+            className="w-[50px] rounded-l-none border-l  border-aa-3 focus:ring-0 focus:ring-offset-0"
             variant="subtle"
           >
             <ArrowDown />

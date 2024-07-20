@@ -128,7 +128,7 @@ export default function ProfileDetails({
   };
 
   return (
-    <div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center bg-aa-1 text-center ml-2 rounded p-2 dark:bg-aa-dark-1">
+    <div className="relative hidden lg:flex lg:flex-col w-[500px] h-[600px] self-center  text-center ml-2 rounded p-2 bg-aa-dark-1">
       {isOwner && (
         <Button
           className="absolute right-1"
@@ -234,7 +234,7 @@ export default function ProfileDetails({
       ) : (
         <>
           {isMutating || loading ? (
-            <Loader2 className="w-20 h-20 m-auto animate-spin text-aa-2 dark:text-aa-3" />
+            <Loader2 className="w-20 h-20 m-auto animate-spin text-aa-3" />
           ) : (
             <Textarea
               placeholder="Tell us a little bit about yourself"

@@ -13,7 +13,7 @@ export default function ShowMore({
     <div className="flex items-center">
       <h1 className="text-xl">{properCase(listType)} List</h1>
       <Link
-        className="ml-auto flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+        className="ml-auto flex gap-1 hover:text-aa-2"
         href={`/${username.split(" ").join("-")}?view=list&list=${listType}`} // onClick={() => viewChanger({ view: "list", list: "watch" })}
       >
         Show

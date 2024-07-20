@@ -2,7 +2,6 @@
 
 import { Star } from "lucide-react";
 import React, { useState } from "react";
-import { z } from "zod";
 
 type RatingsProps = {
   readOnly?: true;

@@ -38,7 +38,7 @@ export default function RateDialog({
     >
       <DialogContent showX>
         <DialogHeader>
-          <DialogTitle className="text-center">Rate {animeName}</DialogTitle>
+          <DialogTitle className="text-center text-white">Rate {animeName}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-2">
           {error && (

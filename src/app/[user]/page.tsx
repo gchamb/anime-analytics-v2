@@ -214,7 +214,7 @@ export default async function Profile({
           <div className="m-auto w-11/12">
             <ShowMore username={username} listType="watch" />
             {watch.length > 0 && (
-              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded  border-aa-2">
                 {watch.map((watchAnime) => {
                   return (
                     <AnimeCover
@@ -232,7 +232,7 @@ export default async function Profile({
           <div className="m-auto w-11/12">
             <ShowMore username={username} listType="plan" />
             {plan.length !== 0 && (
-              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded  border-aa-2">
                 {plan.map((planAnime) => {
                   return (
                     <AnimeCover
@@ -249,7 +249,7 @@ export default async function Profile({
           <div className="m-auto w-11/12">
             <ShowMore username={username} listType="rate" />
             {rate.length !== 0 && (
-              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded border-black dark:border-aa-2">
+              <div className="grid grid-cols-5 gap-2 md:grid-cols-5 lg:grid-cols-10 border-2 p-2 rounded  border-aa-2">
                 {rate.map((rateAnime) => {
                   return (
                     <AnimeCover
@@ -267,7 +267,7 @@ export default async function Profile({
             <div className="flex justify-end">
               <Link
                 href={`?view=analytics`}
-                className="ml-auto md:mr-0 flex gap-1 hover:text-aa-1 dark:hover:text-aa-2"
+                className="ml-auto md:mr-0 flex gap-1 hover:text-aa-2"
               >
                 Analytics
                 <ArrowRight />

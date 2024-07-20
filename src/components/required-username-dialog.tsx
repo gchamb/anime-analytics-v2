@@ -56,10 +56,10 @@ export default function UsernameDialog() {
     <Dialog open={open}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold">
+          <DialogTitle className="text-center text-2xl font-bold text-white">
             Finish Onboarding
           </DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogDescription className="text-center text-white">
             To finish your account creation please give yourself a username.
           </DialogDescription>
         </DialogHeader>
@@ -71,7 +71,7 @@ export default function UsernameDialog() {
         <div className="grid grid-rows-2 gap-2">
           <Input
             autoFocus
-            className="text-center text-lg font-semibold"
+            className="text-center text-lg font-semibold text-white"
             placeholder="Kaneki Ken"
             maxLength={15}
             minLength={3}
