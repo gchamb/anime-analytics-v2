@@ -74,7 +74,7 @@ export default async function Home() {
               Airing Animes
             </h1>
             <div className="flex flex-col gap-y-2  p-5 rounded-md bg-aa-dark-1">
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
+              <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-6">
                 {airing.map((anime, idx) => {
                   return (
                     <AnimeCover
@@ -101,7 +101,7 @@ export default async function Home() {
               Popular Animes
             </h1>
             <div className="flex flex-col gap-y-2 p-5 rounded-md bg-aa-dark-1">
-              <div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
+              <div className="grid grid-cols-3 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
                 {popular.map((anime, idx) => {
                   return (
                     <AnimeCover
@@ -128,7 +128,7 @@ export default async function Home() {
               Upcoming Animes
             </h1>
             <div className="flex flex-col gap-y-2 p-5 rounded-md bg-aa-dark-1">
-              <div className="grid grid-cols-2 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
+              <div className="grid grid-cols-3 gap-2 rounded-md md:grid-cols-4 lg:grid-cols-6">
                 {upcoming.map((anime, idx) => {
                   return (
                     <AnimeCover

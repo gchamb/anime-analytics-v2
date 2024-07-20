@@ -37,59 +37,65 @@ export default function Filters({
   const router = useRouter();
 
   return (
-    <div className="grid grid-cols-4 justify-center gap-x-3 p-5">
-      <Select
-        value={section}
-        onValueChange={(value) => {
-          if (!isSection(value)) {
-            return;
-          }
-          setSection(value);
-        }}
-      >
-        <SelectTrigger className="w-[100px] m-auto md:w-[150px]">
-          <SelectValue placeholder="Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="airing">Airing</SelectItem>
-          <SelectItem value="popular">Popular</SelectItem>
-          <SelectItem value="upcoming">Upcoming</SelectItem>
-        </SelectContent>
-      </Select>
+    <div className="flex flex-col lg:flex-row gap-x-2 items-center justify-center m-2">
+      <div className="grid grid-cols-3 justify-center gap-x-3 p-5">
+        <Select
+          value={section}
+          onValueChange={(value) => {
+            if (!isSection(value)) {
+              return;
+            }
+            setSection(value);
+          }}
+        >
+          <SelectTrigger className="w-[100px] m-auto md:w-[150px]">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="airing">Airing</SelectItem>
+            <SelectItem value="popular">Popular</SelectItem>
+            <SelectItem value="upcoming">Upcoming</SelectItem>
+          </SelectContent>
+        </Select>
 
-      <Select value={genre ?? "all"} onValueChange={(value) => setGenre(value)}>
-        <SelectTrigger className="w-[100px] m-auto md:w-[150px]">
-          <SelectValue placeholder="Genre" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          {getGenres(data).map((genre, idx) => {
-            return (
-              <SelectItem key={idx} value={genre}>
-                {genre}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+        <Select
+          value={genre ?? "all"}
+          onValueChange={(value) => setGenre(value)}
+        >
+          <SelectTrigger className="w-[100px] m-auto md:w-[150px]">
+            <SelectValue placeholder="Genre" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            {getGenres(data).map((genre, idx) => {
+              return (
+                <SelectItem key={idx} value={genre}>
+                  {genre}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
 
-      <Select
-        value={episodes ?? "all"}
-        onValueChange={(value) => {
-          setEpisodes(value);
-        }}
-      >
-        <SelectTrigger className="w-[100px] m-auto md:w-[150px]">
-          <SelectValue placeholder="Episodes" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          <SelectItem value="1-12">1-12</SelectItem>
-          <SelectItem value="12-24">12-24</SelectItem>
-          <SelectItem value="24+">24+</SelectItem>
-        </SelectContent>
-      </Select>
+        <Select
+          value={episodes ?? "all"}
+          onValueChange={(value) => {
+            setEpisodes(value);
+          }}
+        >
+          <SelectTrigger className="w-[100px] m-auto md:w-[150px]">
+            <SelectValue placeholder="Episodes" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="1-12">1-12</SelectItem>
+            <SelectItem value="12-24">12-24</SelectItem>
+            <SelectItem value="24+">24+</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <Button
+        className="w-full max-w-sm lg:max-w-[75px]"
         variant="subtle"
         onClick={() => {
           const url = createQueryString({
