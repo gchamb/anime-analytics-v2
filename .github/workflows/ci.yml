@@ -11,11 +11,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Install PNPM
+        run: npm i -g pnpm
+
       - name: Install Node Dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
   build:
     runs-on: ubuntu-latest
     steps:
@@ -26,8 +29,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
+      - name: Install PNPM
+        run: npm i -g pnpm
+
       - name: Install Node Dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Build
-        run: npm run build
+        run: pnpm build
