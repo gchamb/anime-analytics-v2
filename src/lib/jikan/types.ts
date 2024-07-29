@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type JikanResponse = {
   data: JikanAnime[];
   pagination: JikanPagination;
@@ -12,6 +14,26 @@ export type JikanOption = {
   type: "tv" | "movie" | "ova" | "special" | "ona" | "music";
   filter: "airing" | "upcoming" | "bypopularity" | "favorite";
 };
+
+export function isJikanFilter(data: unknown): data is JikanOption["filter"] {
+  if (typeof data !== "string") {
+    return false;
+  }
+
+  if (data === "airing") {
+    return true;
+  }
+
+  if (data === "bypopularity") {
+    return true;
+  }
+
+  if (data === "upcoming") {
+    return true;
+  }
+
+  return false;
+}
 
 export type JikanTitles = {
   type: string;
@@ -62,7 +84,12 @@ export type JikanAnime = {
   demographics: JikanDemographics[];
 };
 
-export type JikanStatus = "airing" | "complete" | "upcoming";
+export const jikanStatusSchema = z.union([
+  z.literal("airing"),
+  z.literal("complete"),
+  z.literal("upcoming"),
+]);
+export type JikanStatus = z.infer<typeof jikanStatusSchema>;
 
 export const DAYS = [
   "sunday",
@@ -74,7 +101,7 @@ export const DAYS = [
   "saturday",
 ] as const;
 
-export type JikanDays = typeof DAYS[number];
+export type JikanDays = (typeof DAYS)[number];
 
 export type JikanPreview = {
   mal_id: number;
@@ -83,32 +110,36 @@ export type JikanPreview = {
 };
 
 export const JikanGenresMap = {
-  "Action": 1,
-  "Adventure": 2,
+  Action: 1,
+  Adventure: 2,
   "Avant Garde": 5,
   "Award Winning": 46,
   "Boys Love": 28,
-  "Comedy": 4,
-  "Drama": 8,
-  "Fantasy": 10,
+  Comedy: 4,
+  Drama: 8,
+  Fantasy: 10,
   "Girls Love": 26,
-  "Gourmet": 47,
-  "Horror": 4,
-  "Mystery": 7,
-  "Romance": 22,
+  Gourmet: 47,
+  Horror: 4,
+  Mystery: 7,
+  Romance: 22,
   "Sci-Fi": 24,
   "Slice of Life": 36,
-  "Sports": 30,
-  "Supernatural": 37,
-  "Suspense": 41,
-  "Ecchi": 9
+  Sports: 30,
+  Supernatural: 37,
+  Suspense: 41,
+  Ecchi: 9,
 } as const;
 
-export const jikanAnimeGenres = Object.keys(JikanGenresMap) as JikanAnimeGenres[];
+export const jikanAnimeGenres = Object.keys(
+  JikanGenresMap
+) as JikanAnimeGenres[];
 
 export type JikanAnimeGenres = keyof typeof JikanGenresMap;
 
-export const isJikanAnimeGenreArray = (data: string[]): data is JikanAnimeGenres[] => {
+export const isJikanAnimeGenreArray = (
+  data: string[]
+): data is JikanAnimeGenres[] => {
   if (data.length === 0) {
     return false;
   }
@@ -119,7 +150,5 @@ export const isJikanAnimeGenreArray = (data: string[]): data is JikanAnimeGenres
     }
   }
 
-
-
   return true;
-}
+};
