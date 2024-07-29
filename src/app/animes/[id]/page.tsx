@@ -10,23 +10,22 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Metadata, ResolvingMetadata } from "next";
 
-export async function generateMetadata(
-  { params }: { params: { id: string } },
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
   const { data } = await fetchAnime(parseInt(params.id));
-
-  const previousImages = (await parent).openGraph?.images || [];
 
   return {
     title: data.title,
     openGraph: {
       description: data.synopsis ?? "",
-      images: [data.images.jpg.image_url, ...previousImages],
+      images: data.images.jpg.image_url,
     },
     twitter: {
       description: data.synopsis ?? "",
-      images: [data.images.jpg.image_url, ...previousImages],
+      images: data.images.jpg.image_url,
     },
   };
 }
