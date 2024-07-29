@@ -11,8 +11,22 @@ import { ArrowRight } from "lucide-react";
 import { z } from "zod";
 import { List } from "@prisma/client";
 import { getAnalytics } from "@/lib/utils";
+import { Metadata } from "next";
 
 const LIST_MAX = 18;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { user: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}): Promise<Metadata> {
+  const username = params.user.split("-").join(" ");
+
+  return {
+    title: username ?? "Anime Analytics",
+  };
+}
 
 export default async function Profile({
   params,

@@ -7,16 +7,28 @@ import { Sections } from "../../lib/types";
 import { filteredData } from "../../lib/utils";
 import { jikan } from "../../lib/jikan";
 import { z } from "zod";
+import { Metadata } from "next";
+import { properCase } from "@/lib/utils";
+
+type AnimesProps = {
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata(
+  { searchParams }: AnimesProps,
+): Promise<Metadata> {
+  return {
+    title: searchParams?.type
+      ? `${properCase(searchParams.type as string)} Animes`
+      : "Anime Analytics",
+  };
+}
 
 const JikanData = (type: keyof typeof Sections, page: number) => {
   return jikan.getTopAnimes("tv", Sections[type], page);
 };
 
-export default async function Animes({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
+export default async function Animes({ searchParams }: AnimesProps) {
   const animesFilterSchema = z.object({
     type: z
       .union([z.literal("airing"), z.literal("upcoming"), z.literal("popular")])

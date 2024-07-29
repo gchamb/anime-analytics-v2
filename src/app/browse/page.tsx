@@ -9,6 +9,11 @@ import { z } from "zod";
 import BrowseFilters from "./components/browse-filters";
 import AnimeResults from "@/components/anime-results";
 import Pagination from "@/components/pagination";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Browse",
+};
 
 const searchJikan = cache(
   async ({
@@ -53,7 +58,7 @@ export default async function Browse({
   }
 
   const { query, status, genres, page } = valid.data;
-  console.log(valid.data);
+
   const data = await searchJikan({
     query: query ?? "",
     status: status as JikanStatus | undefined,

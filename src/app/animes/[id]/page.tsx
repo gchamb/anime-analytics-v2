@@ -8,6 +8,28 @@ import { getGenres } from "@/lib/utils";
 import { cache } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  { params }: { params: { id: string } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { data } = await fetchAnime(parseInt(params.id));
+
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: data.title,
+    openGraph: {
+      description: data.synopsis ?? "",
+      images: [data.images.jpg.image_url, ...previousImages],
+    },
+    twitter: {
+      description: data.synopsis ?? "",
+      images: [data.images.jpg.image_url, ...previousImages],
+    },
+  };
+}
 
 const fetchAnime = cache((malId: number) => {
   return jikan.getAnime(malId);
@@ -15,10 +37,20 @@ const fetchAnime = cache((malId: number) => {
 
 export default async function Anime({ params }: { params: { id: string } }) {
   if (params === undefined) {
+    return (
+      <div className="flex justify-center items-center w-full h-4/5">
+        <h1 className="text-2xl font-semibold">Invalid Request.</h1>
+      </div>
+    );
   }
 
   const malId = Number(params.id);
   if (isNaN(malId) || (!isNaN(malId) && malId < 1)) {
+    return (
+      <div className="flex justify-center items-center w-full h-4/5">
+        <h1 className="text-2xl font-semibold">Invalid Request.</h1>
+      </div>
+    );
   }
 
   const session = await getServerSession(authOptions);
@@ -36,9 +68,6 @@ export default async function Anime({ params }: { params: { id: string } }) {
 
   return (
     <>
-      {/* <Head>
-        <title>{anime.title}</title>
-      </Head> */}
       <div className="w-11/12 h-max m-auto flex flex-col items-center pt-3 gap-5 lg:flex-row">
         <div className="flex flex-col gap-y-4 items-center text-center lg:w-1/2 lg:m-auto">
           <div className="w-[200px] xl:w-[250px]">
